@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+import { spawn } from 'child_process'
+import { fileURLToPath } from 'url'
+import path from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const cliPath = path.resolve(__dirname, '../src/cli/main.ts')
+const args = process.argv.slice(2)
+
+const child = spawn('npx', ['tsx', cliPath, ...args], {
+  stdio: 'inherit',
+  cwd: process.cwd(),
+})
+
+child.on('exit', (code) => {
+  process.exit(code || 0)
+})

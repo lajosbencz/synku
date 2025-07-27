@@ -10,14 +10,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "paths": {
-      "@core/*": ["./src/core/*"],
-    },
     "types": ["node", "jest"]
   },
-  "include": [
-    "src/**/*",
-    "test/**/*"
-  ],
+  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"]
 }

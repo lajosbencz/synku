@@ -1,8 +1,8 @@
 // Core exports
-export * from './core';
+export * from './core'
 
-// Writer exports  
-export * from './writer/yaml';
+// Writer exports
+export * from './writer/yaml'
 
 // Prefab utilities
-export * from './prefab';
+export * from './prefab'

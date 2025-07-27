@@ -1,0 +1,279 @@
+# ---------------------
+# synku release: webapp
+# ---------------------
+---
+# synku component: webapp
+apiVersion: v1
+kind: ConfigMap
+data:
+  DATABASE_HOST: postgres.webapp-prod
+  REDIS_HOST: redis.webapp-prod
+  LOG_LEVEL: info
+metadata:
+  name: webapp
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+
+---
+# synku component: webapp
+apiVersion: v1
+kind: Secret
+stringData:
+  DATABASE_PASSWORD: super-secret-password
+  JWT_SECRET: jwt-secret-key
+  API_KEY: external-api-key
+metadata:
+  name: webapp
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+
+---
+# synku component: webapp-frontend
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - image: nginx:alpine
+          ports:
+            - containerPort: 80
+          env:
+            - name: NODE_ENV
+              value: development
+          name: webapp-frontend
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
+    metadata:
+      labels:
+        app.kubernetes.io/name: webapp
+        app.kubernetes.io/component: webapp-frontend
+        app.kubernetes.io/managed-by: synku
+        app.kubernetes.io/version: '0'
+        environment: development
+        synku/match: webapp-frontend
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webapp
+      app.kubernetes.io/component: webapp-frontend
+      app.kubernetes.io/managed-by: synku
+      app.kubernetes.io/version: '0'
+      environment: development
+      synku/match: webapp-frontend
+metadata:
+  name: webapp-frontend
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp-frontend
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+
+---
+# synku component: webapp-frontend
+apiVersion: v1
+kind: Service
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    name: webapp-frontend
+metadata:
+  name: webapp-frontend
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp-frontend
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+
+---
+# synku component: webapp-frontend
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+spec:
+  rules:
+    - host: webapp.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webapp-frontend-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - webapp.example.com
+      secretName: webapp-tls
+metadata:
+  name: webapp-frontend
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp-frontend
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+
+---
+# synku component: webapp-backend
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - image: nginx:alpine
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: '3000'
+            - name: NODE_ENV
+              value: development
+          name: webapp-backend
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
+    metadata:
+      labels:
+        app.kubernetes.io/name: webapp
+        app.kubernetes.io/component: webapp-backend
+        app.kubernetes.io/managed-by: synku
+        app.kubernetes.io/version: '0'
+        environment: development
+        synku/match: webapp-backend
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webapp
+      app.kubernetes.io/component: webapp-backend
+      app.kubernetes.io/managed-by: synku
+      app.kubernetes.io/version: '0'
+      environment: development
+      synku/match: webapp-backend
+metadata:
+  name: webapp-backend
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp-backend
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+
+---
+# synku component: webapp-backend
+apiVersion: v1
+kind: Service
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 80
+      targetPort: 3000
+metadata:
+  name: webapp-backend
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp-backend
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+
+---
+# synku component: webapp-backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-backend-worker
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp-backend
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - env:
+            - name: WORKER_TYPE
+              value: background
+            - name: NODE_ENV
+              value: development
+          name: webapp-backend-worker
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
+    metadata:
+      labels:
+        app.kubernetes.io/name: webapp
+        app.kubernetes.io/component: webapp-backend
+        app.kubernetes.io/managed-by: synku
+        app.kubernetes.io/version: '0'
+        environment: development
+        synku/match: webapp-backend-worker
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webapp
+      app.kubernetes.io/component: webapp-backend
+      app.kubernetes.io/managed-by: synku
+      app.kubernetes.io/version: '0'
+      environment: development
+      synku/match: webapp-backend-worker
+
+---
+# synku component: webapp-backend
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+spec:
+  rules:
+    - host: api.webapp.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webapp-api-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - api.webapp.example.com
+      secretName: webapp-api-tls
+metadata:
+  name: webapp-backend
+  labels:
+    app.kubernetes.io/name: webapp
+    app.kubernetes.io/component: webapp-backend
+    app.kubernetes.io/managed-by: synku
+    app.kubernetes.io/version: '0'
+    environment: development

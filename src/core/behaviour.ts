@@ -1,3 +1,3 @@
-import { IComponent } from "./component";
+import { IComponent } from './component'
 
-export type IBehaviour = (component: IComponent) => void;
+export type IBehaviour = (component: IComponent) => void
