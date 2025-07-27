@@ -1,0 +1,44 @@
+{
+  "name": "ksyn",
+  "version": "0.1.0",
+  "description": "Kubernetes SYNthesize manifests",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.esm.js",
+    "require": "./dist/index.cjs.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "jest",
+    "prepublishOnly": "npm run build && npm test",
+    "dev": "tsup --sourcemap --watch --onSuccess 'node dev.js'"
+  },
+  "keywords": [],
+  "author": "Lajos Bencz",
+  "license": "GPLv3",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "jest": "^30.0.5",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@kubernetes-models/base": "^5.0.1",
+    "@kubernetes-models/validate": "^4.0.0",
+    "kubernetes-models": "^4.5.0"
+  },
+  "peerDependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}
