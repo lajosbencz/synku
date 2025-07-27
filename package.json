@@ -4,6 +4,7 @@
   "description": "SYNthesize KUbernetes manifests",
   "type": "module",
   "files": [
+    "src",
     "dist",
     "bin"
   ],
