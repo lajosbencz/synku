@@ -1,5 +1,12 @@
 # synku
 
+## 0.1.2
+
+### Patch Changes
+
+- 7ba5d31: readme
+- fd0dfd8: readme
+
 ## 0.1.1
 
 ### Patch Changes
