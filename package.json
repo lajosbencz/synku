@@ -23,8 +23,7 @@
     "format:check": "prettier --check .",
     "build": "tsup",
     "test": "jest",
-    "version": "changeset version",
-    "publish": "changeset publish"
+    "changeset": "changeset"
   },
   "keywords": [],
   "author": "Lajos Bencz",
