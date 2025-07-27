@@ -45,7 +45,7 @@ export const withDefaultContainer: IBehaviour = (component: IComponent) => {
     }
     manifest.spec.selector.matchLabels = {
       ...manifest.metadata?.labels,
-      'ksyn/match': matchName,
+      'synku/match': matchName,
       ...manifest.spec.selector.matchLabels,
     };
     if (!manifest.spec.template) {
@@ -59,7 +59,7 @@ export const withDefaultContainer: IBehaviour = (component: IComponent) => {
     }
     manifest.spec.template.metadata.labels = {
       ...manifest.metadata?.labels,
-      'ksyn/match': matchName,
+      'synku/match': matchName,
       ...manifest.spec.template.metadata.labels,
     };
     for (const container of manifest.spec?.template?.spec?.containers ?? []) {
@@ -142,7 +142,7 @@ export const withCommonLabels = (name: string, version?: string): IBehaviour => 
 
       manifest.data.metadata.labels['app.kubernetes.io/name'] = name;
       manifest.data.metadata.labels['app.kubernetes.io/component'] = component.getFullName();
-      manifest.data.metadata.labels['app.kubernetes.io/managed-by'] = 'ksyn';
+      manifest.data.metadata.labels['app.kubernetes.io/managed-by'] = 'synku';
 
       if (version) {
         manifest.data.metadata.labels['app.kubernetes.io/version'] = version;

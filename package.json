@@ -1,5 +1,5 @@
 {
-  "name": "ksyn",
+  "name": "synku",
   "version": "0.1.0",
   "description": "Kubernetes SYNthesize manifests",
   "type": "module",
