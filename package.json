@@ -11,7 +11,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "synku": "./bin/synku"
+    "synku": "bin/synku"
   },
   "exports": {
     "types": "./dist/index.d.ts",
