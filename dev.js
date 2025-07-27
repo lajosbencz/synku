@@ -6,7 +6,7 @@ import { join } from 'path';
 const outputFile = join(process.cwd(), 'dev-output.yaml');
 
 // Run your command
-exec('node dist/cli/example.js', async (err, stdout, stderr) => {
+exec('node dist/cli/main.js', async (err, stdout, stderr) => {
   if (err) {
     console.error('Error:', stderr);
     process.exit(1);
