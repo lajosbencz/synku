@@ -1,3 +1,10 @@
 # synku
 
-SYNthesize KUbernetes manifests
+## SYNthesize KUbernetes manifests
+
+### Why?
+
+- Concise
+- Unopinionated
+- Typesafe
+- Composition
