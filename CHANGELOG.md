@@ -1,5 +1,12 @@
 # synku
 
+## 0.1.4
+
+### Patch Changes
+
+- b777c5a: fixup
+- b777c5a: fixup
+
 ## 0.1.3
 
 ### Patch Changes
