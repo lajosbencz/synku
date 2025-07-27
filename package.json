@@ -41,9 +41,7 @@
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
+    "kubernetes-models": "^4.5.0",
     "tsx": "^4.20.3"
-  },
-  "peerDependencies": {
-    "kubernetes-models": "^4.5.0"
   }
 }
