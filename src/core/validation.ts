@@ -3,10 +3,10 @@ import { IComponent } from './component'
 
 export interface ValidationResult {
   isValid: boolean
-  errors: ValidationError[]
+  errors: IValidationError[]
 }
 
-export interface ValidationError {
+export interface IValidationError {
   type: string
   message: string
   component?: IComponent
@@ -167,7 +167,7 @@ export class ManifestValidationError extends Error {
 
 // Core validation runner
 export function validateManifests(manifests: Array<[IComponent, KubernetesObject]>, validators: IValidator[]): ValidationResult {
-  const allErrors: ValidationError[] = []
+  const allErrors: IValidationError[] = []
 
   for (const validator of validators) {
     const result = validator(manifests)
@@ -200,7 +200,7 @@ export const namingCollisionValidator: IValidator = (manifests) => {
     manifestGroups.get(key)!.push({ component, manifest })
   }
 
-  const errors: ValidationError[] = []
+  const errors: IValidationError[] = []
 
   for (const [key, group] of manifestGroups.entries()) {
     if (group.length > 1) {
@@ -225,7 +225,7 @@ export const namingCollisionValidator: IValidator = (manifests) => {
 }
 
 export const requiredMetadataValidator: IValidator = (manifests) => {
-  const errors: ValidationError[] = []
+  const errors: IValidationError[] = []
 
   for (const [component, manifest] of manifests) {
     if (!manifest.metadata?.name) {
@@ -264,7 +264,7 @@ export const requiredMetadataValidator: IValidator = (manifests) => {
 
 export const kubernetesSchemaValidator = (manifestTypes: Map<string, new (...args: any[]) => KubernetesObject>): IValidator => {
   return (manifests) => {
-    const errors: ValidationError[] = []
+    const errors: IValidationError[] = []
 
     for (const [component, manifest] of manifests) {
       const typeKey = `${manifest.apiVersion}/${manifest.kind}`
