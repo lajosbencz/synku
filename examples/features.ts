@@ -1,5 +1,5 @@
 import * as k8s from 'kubernetes-models';
-import { core, writer } from '../lib/index.js';
+import { core, writer, behavior } from '../lib/index.js';
 
 
 // behaviour wrapping a deployment and a service
@@ -91,6 +91,10 @@ const release = new core.Release('example', release => {
         containerPort: 3000,
     }));
 });
+
+
+release.addBehavior(behavior.withName());
+release.addBehavior(behavior.withLabels());
 
 
 // add behaviours
