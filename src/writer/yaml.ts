@@ -1,10 +1,10 @@
-import * as yaml from 'yaml';
-import { IComponent } from './component';
+import { stringify } from 'yaml';
+import { IComponent } from '../core/component';
 
-export function write(records: [IComponent, any[]][], output: NodeJS.WritableStream = process.stdout): void {
+export function yaml(records: [IComponent, any[]][], output: NodeJS.WritableStream = process.stdout): void {
   for (const [component, resources] of records) {
     for (const resource of resources) {
-      const yamlString = yaml.stringify(resource, {
+      const yamlString = stringify(resource, {
         indent: 2,
         lineWidth: 0,
         minContentWidth: 0,

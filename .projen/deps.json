@@ -72,6 +72,11 @@
       "type": "build"
     },
     {
+      "name": "immer",
+      "version": "^10.1.1",
+      "type": "runtime"
+    },
+    {
       "name": "kubernetes-models",
       "version": "^4.5.0",
       "type": "runtime"

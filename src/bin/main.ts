@@ -1,6 +1,7 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
-import { Release, write } from '../index.js';
+import { Release } from '../core/index.js';
+import { yaml } from '../writer/index.js';
 
 async function executeUserFile(filePath: string): Promise<Release> {
   const absPath = path.resolve(process.cwd(), filePath);
@@ -29,10 +30,10 @@ async function main() {
 
   const release = await executeUserFile(file);
   const manifests = release.synth();
-  write(manifests, process.stdout);
+  yaml(manifests, process.stdout);
 }
 
 main().catch((error) => {
-  console.error('Error:', error instanceof Error ? error.message : String(error));
+  console.error(error);
   process.exit(2);
 });

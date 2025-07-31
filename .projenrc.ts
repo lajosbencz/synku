@@ -23,6 +23,7 @@ const project = new TypeScriptProject({
     'kubernetes-models@^4.5.0',
     'yaml@^2.8.0',
     'tsx@^4.20.3',
+    'immer@^10.1.1',
   ],
   devDeps: [],
 

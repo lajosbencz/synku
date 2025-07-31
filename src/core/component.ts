@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { IBehavior } from './behavior';
 import { DeepPartial } from './types';
 
@@ -26,6 +27,7 @@ export class Component implements IComponent {
   public readonly children: IComponent[] = [];
   protected resources: any[] = [];
   protected behaviors: IBehavior[] = [];
+  private _synthContext?: { resources: any[]; isSynthing: boolean } = undefined;
 
   constructor(public readonly name: string, init: ComponentInit) {
     init(this);
@@ -69,11 +71,14 @@ export class Component implements IComponent {
   findAll<T>(resourceType?: new(...args: any[]) => T): T[] {
     const results: T[] = [];
 
+    // Use synth context resources if we're in synthesis mode, otherwise use original resources
+    const resourcesSource = this._synthContext?.isSynthing ? this._synthContext.resources : this.resources;
+
     // Find resources in this component
     if (resourceType) {
-      results.push(...this.resources.filter(r => r instanceof resourceType));
+      results.push(...resourcesSource.filter(r => r instanceof resourceType));
     } else {
-      results.push(...this.resources);
+      results.push(...resourcesSource);
     }
 
     return results;
@@ -89,10 +94,25 @@ export class Component implements IComponent {
 
   synth(): [IComponent, any[]][] {
     const list: [IComponent, any[]][] = [];
-    this.getInheritedBehaviors().forEach(behavior => behavior(this));
-    list.push([this, this.findAll()]);
-    for(const child of this.children) {
-        list.push(...child.synth())
+
+    // Create immutable copies using immer and apply behaviors
+    const immutableResources = produce(this.resources, (draft: any[]) => {
+      // Set synthesis context so findAll returns the draft resources
+      this._synthContext = { resources: draft, isSynthing: true };
+
+      try {
+        // Apply all inherited behaviors to the draft
+        this.getInheritedBehaviors().forEach(behavior => behavior(this));
+      } finally {
+        // Clean up synthesis context
+        this._synthContext = undefined;
+      }
+    });
+
+    list.push([this, immutableResources]);
+
+    for (const child of this.children) {
+      list.push(...child.synth());
     }
     return list;
   }
