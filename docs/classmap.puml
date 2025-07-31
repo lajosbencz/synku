@@ -1,0 +1,17 @@
+@startuml 'synku classmap'
+
+interface INode {
+    parent: IComponent | undefined
+    children: IComponent[]
+    behaviors: IBehavior[]
+}
+
+interface IBehavior {
+    (component: IComponent): void
+}
+
+interface IComponent<INode, IBehavior> {
+    name: string
+}
+
+@enduml
