@@ -1,6 +1,10 @@
 {
   "name": "synku",
   "description": "SYNthesize KUbernetes manifests",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lajosbencz/synku"
+  },
   "bin": {
     "synku": "lib/bin/main.js"
   },

@@ -7,6 +7,7 @@ const project = new TypeScriptProject({
   authorName: 'Lajos Bencz',
   license: 'MIT',
   copyrightOwner: 'Lajos Bencz',
+  repository: 'https://github.com/lajosbencz/synku',
   bugsUrl: 'https://github.com/lajosbencz/synku/issues',
   defaultReleaseBranch: 'master',
   majorVersion: 0,
