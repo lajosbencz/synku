@@ -1,129 +1,199 @@
-# example-backend-queue
-apiVersion: apps/v1
-kind: StatefulSet
-spec:
-  template:
-    spec:
-      containers:
-        - image: mqtt
-metadata:
-  name: example-backend-queue
-  labels:
-    synku/release: example
-    synku/component: example-backend-queue
-
----
-# example-backend-worker
-apiVersion: apps/v1
-kind: DaemonSet
-spec:
-  template:
-    spec:
-      containers:
-        - image: custom-worker
-metadata:
-  name: example-backend-worker
-  labels:
-    synku/release: example
-    synku/component: example-backend-worker
-
----
-# example-backend-api
-apiVersion: apps/v1
-kind: Deployment
-spec:
-  template:
-    spec:
-      containers:
-        - image: custom-api:latest
-          ports:
-            - containerPort: 8080
-          env:
-            - name: HTTP_PORT
-              value: "8080"
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 100m
-              memory: 128Mi
-  replicas: 2
-  selector:
-    matchLabels:
-      synku/release: example
-      synku/component: example-backend-api
-metadata:
-  name: example-backend-api
-  labels:
-    synku/release: example
-    synku/component: example-backend-api
-
----
-# example-backend-api
-apiVersion: v1
-kind: Service
-spec:
-  type: ClusterIP
-  ports:
-    - port: 80
-      targetPort: 8080
-  selector:
-    synku/release: example
-    synku/component: example-backend-api
-metadata:
-  name: example-backend-api
-  labels:
-    synku/release: example
-    synku/component: example-backend-api
-
----
 # example-ui
 apiVersion: apps/v1
 kind: Deployment
+metadata:
+  annotations:
+    static: annotation
+  labels:
+    static: label
+    synku/component: example-ui
+    synku/release: example
+  name: example-ui
 spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      example-component: example-ui
+      example-release: example
   template:
+    metadata:
+      labels:
+        synku/app: example-ui
     spec:
       containers:
         - image: custom-ui:latest
+          name: ui
           ports:
             - containerPort: 3000
-          env:
-            - name: HTTP_PORT
-              value: "3000"
+              protocol: TCP
           resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
             limits:
               cpu: 100m
               memory: 128Mi
-  replicas: 2
-  selector:
-    matchLabels:
-      synku/release: example
-      synku/component: example-ui
-metadata:
-  name: undefinedexample-ui
-  labels:
-    synku/release: example
-    synku/component: example-ui
+            requests:
+              cpu: 100m
+              memory: 128Mi
 
 ---
 # example-ui
 apiVersion: v1
 kind: Service
+metadata:
+  annotations:
+    static: annotation
+  labels:
+    static: label
+    synku/component: example-ui
+    synku/release: example
+  name: example-ui
 spec:
-  type: ClusterIP
   ports:
     - port: 80
       targetPort: 3000
   selector:
-    synku/release: example
-    synku/component: example-ui
-metadata:
-  name: undefinedexample-ui
-  labels:
-    synku/release: example
-    synku/component: example-ui
+    example-component: example-ui
+    example-release: example
+  type: ClusterIP
 
+---
+# example-backend-queue
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    static: annotation
+  labels:
+    static: label
+    synku/component: example-backend-queue
+    synku/release: example
+  name: example-backend-queue
+spec:
+  selector:
+    matchLabels:
+      example-component: example-backend-queue
+      example-release: example
+  serviceName: example-backend-queue
+  template:
+    spec:
+      containers:
+        - image: mqtt
+          name: queue
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+---
+# example-backend-queue
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    static: annotation
+  labels:
+    static: label
+    synku/component: example-backend-queue
+    synku/release: example
+  name: example-backend-queue
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    example-component: example-backend-queue
+    example-release: example
+  type: ClusterIP
+
+---
+# example-backend-worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    static: annotation
+  labels:
+    static: label
+    synku/component: example-backend-worker
+    synku/release: example
+  name: example-backend-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      example-component: example-backend-worker
+      example-release: example
+  template:
+    spec:
+      containers:
+        - image: custom-worker
+          name: worker
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+---
+# example-backend-api
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    static: annotation
+  labels:
+    static: label
+    synku/component: example-backend-api
+    synku/release: example
+  name: example-backend-api
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      example-component: example-backend-api
+      example-release: example
+  template:
+    metadata:
+      labels:
+        synku/app: example-backend-api
+    spec:
+      containers:
+        - image: custom-api:latest
+          name: api
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+---
+# example-backend-api
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    static: annotation
+  labels:
+    static: label
+    synku/component: example-backend-api
+    synku/release: example
+  name: example-backend-api
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    example-component: example-backend-api
+    example-release: example
+  type: ClusterIP

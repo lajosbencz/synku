@@ -1,20 +1,20 @@
-import { IBehavior } from '../core';
+import { Behavior } from '../behavior';
 
-export function withName(prefix?: string): IBehavior {
+export function defaultName(prefix?: string): Behavior {
   if (prefix) {
     prefix = `${prefix}-`;
   }
   return component => {
     component.findAll().forEach(resource => {
       resource.metadata = {
-        name: `${prefix}${component.fullName}`,
+        name: `${prefix ?? ''}${component.fullName}`,
         ...resource.metadata,
       };
     });
   };
 }
 
-export function withLabels(labels: Record<string, string>): IBehavior {
+export function defaultLabels(labels: Record<string, string>): Behavior {
   return component => {
     component.findAll().forEach(resource => {
       resource.metadata = {
@@ -28,7 +28,7 @@ export function withLabels(labels: Record<string, string>): IBehavior {
   };
 }
 
-export function withAnnotations(annotations: Record<string, string>): IBehavior {
+export function defaultAnnotations(annotations: Record<string, string>): Behavior {
   return component => {
     component.findAll().forEach(resource => {
       resource.metadata = {

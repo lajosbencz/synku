@@ -1,4 +1,108 @@
 
-test('hello', () => {
-  expect('hello, world!').toBe('hello, world!');
+import { ConfigMap, Secret } from 'kubernetes-models/v1';
+import { Component } from '../src/component';
+
+describe('Component', () => {
+
+  describe('simple', () => {
+    const config = {
+      data: {
+        foo: 'bar',
+      },
+    };
+    const secret = {
+      stringData: {
+        foo: 'bar',
+      },
+    };
+    const component = new Component(undefined, 'test');
+    component
+      .resource(ConfigMap, config)
+      .resource(Secret, secret);
+
+    it('should be named', () => {
+      expect(component.name).toEqual('test');
+    });
+    it('should find', () => {
+      const d = component.find(ConfigMap);
+      expect(d.data!.foo).toBe(config.data.foo);
+    });
+    it('should findAll', () => {
+      expect(component.findAll(ConfigMap)[0].data.foo).toEqual(config.data.foo);
+      expect(component.findAll(Secret, ConfigMap).length).toEqual(2);
+    });
+    component.behavior(bc => bc.findAll().forEach(r => r.name = bc.name));
+    const syn = component.synth();
+    it('should return synthesis', () => {
+      expect(syn).toBeDefined();
+      expect(syn instanceof Array).toBeTruthy();
+      expect(syn.length).toEqual(1);
+    });
+    const [synComponent, synResources] = syn[0];
+    it('should include component in synthesis', () => {
+      expect(synComponent).toEqual(component);
+    });
+    it('should return modified resources in synthesis', () => {
+      expect(synResources instanceof Array).toBeTruthy();
+      expect(synResources.length).toEqual(2);
+      expect(synResources[0].data.foo).toEqual('bar');
+    });
+  });
+
+  describe('tree', () => {
+    const r = new Component(undefined, 'r');
+    it('should have no parent', () => {
+      expect(r.parent).toEqual(undefined);
+    });
+    const c1 = r.component('c1');
+    const c2 = r.component('c2');
+    const l = c2.component('l');
+    it('should have children', () => {
+      expect(r.children).toEqual([c1, c2]);
+    });
+    it('should have parent', () => {
+      expect(c1.parent).toEqual(r);
+      expect(c2.parent).toEqual(r);
+      expect(l.parent).toEqual(c2);
+    });
+    it('should have root', () => {
+      expect(r.root).toEqual(r);
+      expect(c1.root).toEqual(r);
+      expect(c2.root).toEqual(r);
+      expect(l.root).toEqual(r);
+    });
+    it('should have fullName', () => {
+      expect(r.fullName).toBe('r');
+      expect(c1.fullName).toBe('r-c1');
+      expect(c2.fullName).toBe('r-c2');
+      expect(l.fullName).toBe('r-c2-l');
+    });
+  });
+
+  describe('behaviours', () => {
+    it('should behave', () => {
+      const r = new Component(undefined, 'r');
+      r.resource(ConfigMap, {
+        data: { foo: 'bar' },
+      });
+      r.behavior(c => c.find(ConfigMap).data!.baz = 'bax');
+      const [[_, [sr]]] = r.synth();
+      expect(sr.data.foo).toEqual('bar');
+      expect(sr.data.baz).toEqual('bax');
+    });
+    it('should inherit', () => {
+      const r = new Component(undefined, 'r');
+      r.component('c', c => {
+        c.component('l', l => {
+          l.resource(ConfigMap, {
+            data: { foo: 'bar' },
+          });
+        });
+      });
+      r.behavior(bc => bc.findAll(ConfigMap).forEach(br => br.data!.baz = 'bax'));
+      const [[_, [sr]]] = r.synth();
+      expect(sr.data.foo).toEqual('bar');
+      expect(sr.data.baz).toEqual('bax');
+    });
+  });
 });

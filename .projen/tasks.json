@@ -164,8 +164,7 @@
       "description": "Prepare a release from \"master\" branch",
       "env": {
         "RELEASE": "true",
-        "MAJOR": "0",
-        "PRERELEASE": "beta"
+        "MAJOR": "0"
       },
       "steps": [
         {
@@ -238,7 +237,7 @@
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @stylistic/eslint-plugin @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser commit-and-tag-version constructs eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen ts-jest ts-node typescript immer kubernetes-models tsx yaml"
+          "exec": "yarn upgrade @stylistic/eslint-plugin @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser commit-and-tag-version constructs eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit kubernetes-models projen ts-jest ts-node typescript tsx yaml"
         },
         {
           "exec": "npx projen"

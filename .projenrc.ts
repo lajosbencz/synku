@@ -19,14 +19,16 @@ const project = new TypeScriptProject({
   bin: {
     synku: 'lib/bin/main.js',
   },
-
-  deps: [
+  devDeps: [
     'kubernetes-models@^4.5.0',
+  ],
+  deps: [
     'yaml@^2.8.0',
     'tsx@^4.20.3',
-    'immer@^10.1.1',
   ],
-  devDeps: [],
+  peerDeps: [
+    'kubernetes-models@^4.5.0',
+  ],
 
   releaseToNpm: true,
   npmRegistryUrl: 'https://registry.npmjs.org/',

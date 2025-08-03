@@ -45,14 +45,16 @@
     "eslint-plugin-import": "^2.32.0",
     "jest": "^30.0.5",
     "jest-junit": "^16",
+    "kubernetes-models": "4.5.0",
     "projen": "^0.95.0",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
+  "peerDependencies": {
+    "kubernetes-models": "^4.5.0"
+  },
   "dependencies": {
-    "immer": "^10.1.1",
-    "kubernetes-models": "^4.5.0",
     "tsx": "^4.20.3",
     "yaml": "^2.8.0"
   },
