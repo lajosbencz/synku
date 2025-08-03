@@ -11,7 +11,7 @@ const project = new TypeScriptProject({
   bugsUrl: 'https://github.com/lajosbencz/synku/issues',
   defaultReleaseBranch: 'master',
   majorVersion: 0,
-  prerelease: 'beta',
+  // prerelease: 'beta',
   projenrcTs: true,
   packageManager: NodePackageManager.YARN_CLASSIC,
 
