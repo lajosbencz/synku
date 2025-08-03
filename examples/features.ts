@@ -15,7 +15,7 @@ function simpleWebApp({
     port?: number,
 }): core.IBehavior {
     return component => {
-        component.add(k8s.apps.v1.Deployment, {
+        component.resource(k8s.apps.v1.Deployment, {
             spec: {
                 template: {
                     spec: {
@@ -32,7 +32,7 @@ function simpleWebApp({
                 },
             },
         });
-        component.add(k8s.v1.Service, {
+        component.resource(k8s.v1.Service, {
             spec: {
                 type: 'ClusterIP',
                 ports: [
@@ -44,13 +44,11 @@ function simpleWebApp({
 }
 
 
-// create draft
-const release = new core.Release('example', release => {
+const release = core.Release.new("example", release => {
+    release.component('backend', backend => {
 
-    release.addComponent('backend', backend => {
-
-        backend.addComponent('queue', queue => {
-            queue.add(k8s.apps.v1.StatefulSet, {
+        backend.component('queue', queue => {
+            queue.resource(k8s.apps.v1.StatefulSet, {
                 spec: {
                     template: {
                         spec: {
@@ -65,8 +63,8 @@ const release = new core.Release('example', release => {
             })
         });
 
-        backend.addComponent('worker', queue => {
-            queue.add(k8s.apps.v1.DaemonSet, {
+        backend.component('worker', queue => {
+            queue.resource(k8s.apps.v1.DaemonSet, {
                 spec: {
                     template: {
                         spec: {
@@ -81,24 +79,23 @@ const release = new core.Release('example', release => {
             })
         });
 
-        backend.addComponent('api', simpleWebApp({
+        backend.component('api', simpleWebApp({
             image: 'custom-api',
         }));
     });
 
-    release.addComponent('ui', simpleWebApp({
+    release.component('ui', simpleWebApp({
         image: 'custom-ui',
         containerPort: 3000,
     }));
 });
 
 
-release.addBehavior(behavior.withName());
-release.addBehavior(behavior.withLabels());
+release.behavior(behavior.withName());
 
 
 // add behaviours
-release.addBehavior((c: core.IComponent) => {
+release.behavior((c: core.IComponent) => {
     // set metadata name from nested component names
     c.findAll().forEach(m => {
         m.metadata = {
@@ -112,7 +109,7 @@ release.addBehavior((c: core.IComponent) => {
             ...m.metadata,
             labels: {
                 ...m.metadata.labels,
-                'synku/release': c.release.name,
+                'synku/release': c.root.name,
                 'synku/component': c.fullName,
             },
         }
@@ -139,7 +136,7 @@ release.addBehavior((c: core.IComponent) => {
     ];
     if (deployments.length === 1) {
         const matchLabels = {
-            'synku/release': c.release.name,
+            'synku/release': c.root.name,
             'synku/component': c.fullName,
         };
         const deployment = deployments[0];

@@ -6,34 +6,35 @@ export type ComponentInit = (component: IComponent) => void;
 
 export interface INode {
   readonly parent?: IComponent;
+  readonly root: IComponent;
   readonly children: IComponent[];
 }
 
 export interface IComponent extends INode {
   readonly name: string;
   readonly fullName: string;
-  readonly release: IComponent;
-  addComponent(name: string, init: ComponentInit): IComponent;
-  add<T>(resourceType: new(...args: any[]) => T, manifest: DeepPartial<T>): T;
+  component(name: string, init: ComponentInit): IComponent;
+  resource<T>(resourceType: new(...args: any[]) => T, manifest: DeepPartial<T>): IComponent;
   findAll<T = any>(resourceType?: new(...args: any[]) => T): T[];
-  addBehavior(behavior: IBehavior): void;
-  getInheritedBehaviors(): IBehavior[];
+  behavior(behavior: IBehavior): void;
+  getBehaviors(): IBehavior[];
   synth(): [IComponent, any[]][];
 }
 
 export class Component implements IComponent {
 
   protected _parent?: IComponent;
-  public readonly children: IComponent[] = [];
-  protected resources: any[] = [];
-  protected behaviors: IBehavior[] = [];
+  protected _children: IComponent[] = [];
+  protected _resources: any[] = [];
+  protected _behaviors: IBehavior[] = [];
   private _synthContext?: { resources: any[]; isSynthing: boolean } = undefined;
 
-  constructor(public readonly name: string, init: ComponentInit) {
+  constructor(parent: IComponent | undefined, public readonly name: string, init: ComponentInit) {
+    this._parent = parent;
     init(this);
   }
 
-  get release(): IComponent {
+  get root(): IComponent {
     let root: IComponent = this;
     while (root.parent) {
       root = root.parent;
@@ -45,34 +46,42 @@ export class Component implements IComponent {
     return this._parent;
   }
 
+  get children(): IComponent[] {
+    return this._children;
+  }
+
   get fullName(): string {
     let fullName = '';
     let node: IComponent | undefined = this;
     do {
-      fullName = `${node.name}-${fullName}`;
+      if (fullName !== '') {
+        fullName = `${node.name}-${fullName}`;
+      } else {
+        fullName = node.name;
+      }
       node = node.parent;
     } while (node);
-    return fullName.replace(/-$/, '');
+    return fullName;
   }
 
-  addComponent(name: string, init: ComponentInit): IComponent {
-    const component = new Component(name, init);
+  component(name: string, init: ComponentInit): IComponent {
+    const component = new Component(this, name, init);
     (component as any)._parent = this;
     this.children.push(component);
     return component;
   }
 
-  add<T>(resourceType: new(...args: any[]) => T, manifest: DeepPartial<T>): T {
+  resource<T>(resourceType: new(...args: any[]) => T, manifest: DeepPartial<T>): IComponent {
     const resource = new resourceType(manifest);
-    this.resources.push(resource);
-    return resource;
+    this._resources.push(resource);
+    return this;
   }
 
   findAll<T>(resourceType?: new(...args: any[]) => T): T[] {
     const results: T[] = [];
 
     // Use synth context resources if we're in synthesis mode, otherwise use original resources
-    const resourcesSource = this._synthContext?.isSynthing ? this._synthContext.resources : this.resources;
+    const resourcesSource = this._synthContext?.isSynthing ? this._synthContext.resources : this._resources;
 
     // Find resources in this component
     if (resourceType) {
@@ -84,25 +93,25 @@ export class Component implements IComponent {
     return results;
   }
 
-  addBehavior(behavior: IBehavior): void {
-    this.behaviors.push(behavior);
+  behavior(behavior: IBehavior): void {
+    this._behaviors.push(behavior);
   }
 
-  getInheritedBehaviors(): IBehavior[] {
-    return [...this.parent?.getInheritedBehaviors()??[], ...this.behaviors].reverse();
+  getBehaviors(): IBehavior[] {
+    return [...this._parent?.getBehaviors()??[], ...this._behaviors].reverse();
   }
 
   synth(): [IComponent, any[]][] {
     const list: [IComponent, any[]][] = [];
 
     // Create immutable copies using immer and apply behaviors
-    const immutableResources = produce(this.resources, (draft: any[]) => {
+    const immutableResources = produce(this._resources, (draft: any[]) => {
       // Set synthesis context so findAll returns the draft resources
       this._synthContext = { resources: draft, isSynthing: true };
 
       try {
         // Apply all inherited behaviors to the draft
-        this.getInheritedBehaviors().forEach(behavior => behavior(this));
+        this.getBehaviors().forEach(behavior => behavior(this));
       } finally {
         // Clean up synthesis context
         this._synthContext = undefined;
