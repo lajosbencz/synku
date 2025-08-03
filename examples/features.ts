@@ -61,10 +61,16 @@ const release = core.Release.new("example", release => {
                     },
                 },
             })
+            queue.resource(k8s.v1.Service, {
+                spec: {
+                    type: 'ClusterIP',
+                    ports: [{ port: 80, targetPort: 8080 }],
+                },
+            });
         });
 
         backend.component('worker', queue => {
-            queue.resource(k8s.apps.v1.DaemonSet, {
+            queue.resource(k8s.apps.v1.Deployment, {
                 spec: {
                     template: {
                         spec: {
@@ -76,7 +82,7 @@ const release = core.Release.new("example", release => {
                         },
                     },
                 },
-            })
+            });
         });
 
         backend.component('api', simpleWebApp({
@@ -92,6 +98,14 @@ const release = core.Release.new("example", release => {
 
 
 release.behavior(behavior.withName());
+
+release.behavior(component => {
+    component
+        .findAll(k8s.apps.v1.Deployment)
+        .forEach(deployment => deployment.spec!.template!.spec!.containers
+            ?.forEach(container => container.name ??= component.name)
+        );
+});
 
 
 // add behaviours
@@ -129,23 +143,32 @@ release.behavior((c: core.IComponent) => {
             };
         });
     });
+    const matchLabels = {
+        'synku/release': c.root.name,
+        'synku/component': c.fullName,
+    };
     // if theres only one deployment in a component, assign all services to it
-    const deployments = [
-        ...c.findAll(k8s.apps.v1.Deployment),
-        ...c.findAll(k8s.apps.v1.StatefulSet),
-    ];
+    const services = c.findAll(k8s.v1.Service);
+    const deployments = c.findAll(k8s.apps.v1.Deployment);
     if (deployments.length === 1) {
-        const matchLabels = {
-            'synku/release': c.root.name,
-            'synku/component': c.fullName,
-        };
         const deployment = deployments[0];
         deployment.spec!.replicas = 2;
         deployment.spec!.selector = { matchLabels };
-        c.findAll(k8s.v1.Service).forEach(svc => {
+        services.forEach(svc => {
             svc.spec!.selector = matchLabels;
         })
     }
+
+    // if there's only one service and a statefulset, couple them
+    const statefulsets = c.findAll(k8s.apps.v1.StatefulSet);
+    if (statefulsets.length === 1 && services.length === 1) {
+        const statefulset = statefulsets[0];
+        const service = services[0];
+        statefulset.spec!.serviceName = c.fullName;
+        statefulset.spec!.selector = { matchLabels };
+        service.spec!.selector = matchLabels;
+    }
+    console.log(services, deployments, statefulsets);
 });
 
 
