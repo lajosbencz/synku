@@ -3,7 +3,7 @@ import { IComponent } from './component';
 
 
 export function sortMapEntries(a: Pair, b: Pair) {
-  const desiredOrder = ['apiVersion', 'kind', 'metadata'];
+  const desiredOrder = ['apiVersion', 'kind', 'metadata', 'name', 'labels', 'annotations'];
   const keyA = String(a.key);
   const keyB = String(b.key);
   const idxA = desiredOrder.indexOf(keyA);
