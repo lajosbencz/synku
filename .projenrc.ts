@@ -34,6 +34,12 @@ const project = new TypeScriptProject({
   npmRegistryUrl: 'https://registry.npmjs.org/',
   npmAccess: NpmAccess.PUBLIC,
   npmTokenSecret: 'NPM_TOKEN',
+  npmIgnoreOptions: {
+    ignorePatterns: [
+      '/docs/',
+      '/examples/',
+    ],
+  },
 });
 
 project.synth();
