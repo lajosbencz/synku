@@ -24,8 +24,7 @@ export class TypeScriptGenerator {
     const classCode = this.generateChartClass(className, interfaceName, sourceUrl, metadata);
 
     const fullCode = [
-      "import { HelmChart } from 'synku/helm';",
-      "import { IComponent } from 'synku';",
+      "import { IComponent, helm } from 'synku';",
       '',
       interfaceCode,
       '',
@@ -189,7 +188,7 @@ export class TypeScriptGenerator {
  * ${className} - Helm chart wrapper${description}${version}${home}
  * @source ${sourceUrl}
  */
-export class ${className} extends HelmChart<${interfaceName}> {
+export class ${className} extends helm.Chart<${interfaceName}> {
   constructor(values: ${interfaceName}, name?: string, parent?: IComponent) {
     super('${sourceUrl}', values, name || '${metadata.name}', parent);
   }

@@ -10,6 +10,14 @@ export function resourceEquality(a: any, b: any): boolean {
 
 export type ComponentInit = (component: IComponent) => void;
 
+export interface ComponentConstructor<T extends IComponent = IComponent> {
+  new (name: string, parent?: IComponent): T;
+}
+
+export interface ComponentConstructorWithArgs<T extends IComponent = IComponent, TArgs extends any[] = any[]> {
+  new (...args: TArgs): T;
+}
+
 export interface IComponent {
   readonly parent?: IComponent;
   readonly root: IComponent;
@@ -17,6 +25,8 @@ export interface IComponent {
   readonly name: string;
   readonly fullName: string;
   component(name: string, init?: ComponentInit): IComponent;
+  component<T extends IComponent>(name: string, componentType: ComponentConstructor<T>, init?: ComponentInit): T;
+  component<T extends IComponent>(name: string, componentType: ComponentConstructorWithArgs<T>, ...args: any[]): T;
   resource<T>(resourceType: Constructor<T>, draft: DeepPartial<T>): IComponent;
   find<T = any>(resourceType: Constructor<T>): T;
   findAll(): any[];
@@ -75,10 +85,54 @@ export class Component implements IComponent {
     return fullName;
   }
 
-  component(name: string, init?: ComponentInit): IComponent {
-    const component = new Component(this, name);
-    init?.(component);
-    return component;
+  component(name: string, init?: ComponentInit): IComponent;
+  component<T extends IComponent>(name: string, componentType: ComponentConstructor<T>, init?: ComponentInit): T;
+  component<T extends IComponent>(name: string, componentType: ComponentConstructorWithArgs<T>, ...args: any[]): T;
+  component<T extends IComponent>(
+    name: string,
+    componentTypeOrInit?: ComponentConstructor<T> | ComponentConstructorWithArgs<T> | ComponentInit,
+    ...args: any[]
+  ): IComponent | T {
+    // Simple component creation with name and init
+    if (!componentTypeOrInit || typeof componentTypeOrInit === 'function' && componentTypeOrInit.length === 1) {
+      const init = componentTypeOrInit as ComponentInit | undefined;
+      const component = new Component(this, name);
+      init?.(component);
+      return component;
+    }
+
+    // Component creation with constructor
+    const ComponentType = componentTypeOrInit as ComponentConstructor<T> | ComponentConstructorWithArgs<T>;
+
+    try {
+      // Try as ComponentConstructor (name, parent)
+      if (args.length === 0 || (args.length === 1 && typeof args[0] === 'function')) {
+        const init = args[0] as ComponentInit | undefined;
+        const component = new (ComponentType as ComponentConstructor<T>)(name, this);
+        init?.(component);
+        return component;
+      }
+      
+      // Try as ComponentConstructorWithArgs (...args, name, parent)
+      else {
+        // Find optional init function from the end of arguments
+        let constructorArgs = [...args];
+        let init: ComponentInit | undefined;
+
+        // Check if last argument is an init function
+        if (constructorArgs.length > 0 && typeof constructorArgs[constructorArgs.length - 1] === 'function') {
+          init = constructorArgs.pop() as ComponentInit;
+        }
+
+        // Create the component with constructor args, name, and parent
+        const finalArgs = [...constructorArgs, name, this];
+        const component = new (ComponentType as any)(...finalArgs);
+        init?.(component);
+        return component;
+      }
+    } catch (error) {
+      throw new Error(`Failed to create component: ${error}`);
+    }
   }
 
   resource<T>(resourceType: Constructor<T>, draft: DeepPartial<T>): IComponent {

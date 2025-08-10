@@ -31,7 +31,7 @@ release.component('ui').behavior(behavior.simpleApp({
 // create backend component
 release.component('backend', backend => {
 
-  const kafkaChart = new KafkaChart({
+  backend.component('kafka', KafkaChart, {
     initContainers: [
       {
         image: 'foobar',
@@ -39,7 +39,7 @@ release.component('backend', backend => {
         args: ['foobar'],
       },
     ],
-  }, 'kafka', backend);
+  });
 
   // create queue component nested under backend
   backend.component('queue', queue => {

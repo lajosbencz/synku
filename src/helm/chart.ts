@@ -7,7 +7,7 @@ import { detectChartSource, ChartFetcherFactory } from './fetcher';
 import { FetchOptions } from './types';
 
 
-export class HelmChart<TValues = any> extends Component {
+export class Chart<TValues = any> extends Component {
   private tempPath?: string;
   private chartPath?: string;
   private rendered = false;

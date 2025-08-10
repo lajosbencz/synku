@@ -1,5 +1,4 @@
-import { HelmChart } from '../src/helm';
-import { IComponent } from '../src';
+import { IComponent, helm } from '../src';
 
 export interface KafkaChartValues {
   global?: {
@@ -972,7 +971,7 @@ export interface KafkaChartValues {
  * @see https://bitnami.com
  * @source oci://registry-1.docker.io/bitnamicharts/kafka
  */
-export class KafkaChart extends HelmChart<KafkaChartValues> {
+export class KafkaChart extends helm.Chart<KafkaChartValues> {
   constructor(values: KafkaChartValues, name?: string, parent?: IComponent) {
     super('oci://registry-1.docker.io/bitnamicharts/kafka', values, name || 'kafka', parent);
   }
