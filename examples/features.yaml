@@ -2,10 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: kafka-broker
+  name: example-backend-kafka-broker
   labels:
     app.kubernetes.io/component: broker
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
@@ -27,7 +27,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: broker
-      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/instance: example-backend-kafka
       app.kubernetes.io/name: kafka
       app.kubernetes.io/part-of: kafka
   policyTypes:
@@ -39,10 +39,10 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: kafka-controller
+  name: example-backend-kafka-controller
   labels:
     app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
@@ -65,7 +65,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: controller-eligible
-      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/instance: example-backend-kafka
       app.kubernetes.io/name: kafka
       app.kubernetes.io/part-of: kafka
   policyTypes:
@@ -77,10 +77,10 @@ spec:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: kafka-broker
+  name: example-backend-kafka-broker
   labels:
     app.kubernetes.io/component: broker
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
@@ -97,7 +97,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: broker
-      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/instance: example-backend-kafka
       app.kubernetes.io/name: kafka
       app.kubernetes.io/part-of: kafka
 
@@ -106,10 +106,10 @@ spec:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: kafka-controller
+  name: example-backend-kafka-controller
   labels:
     app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
@@ -126,7 +126,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: controller-eligible
-      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/instance: example-backend-kafka
       app.kubernetes.io/name: kafka
       app.kubernetes.io/part-of: kafka
 
@@ -135,9 +135,9 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kafka-provisioning
+  name: example-backend-kafka-provisioning
   labels:
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
@@ -155,10 +155,10 @@ automountServiceAccountToken: false
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kafka
+  name: example-backend-kafka
   labels:
     app.kubernetes.io/component: kafka
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
@@ -176,9 +176,9 @@ automountServiceAccountToken: false
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kafka-user-passwords
+  name: example-backend-kafka-user-passwords
   labels:
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
@@ -190,10 +190,10 @@ metadata:
     static: annotation
   namespace: default
 data:
-  client-passwords: UTlZVTJYdHFPaA==
-  controller-password: NmtlMmtmYUNaZw==
-  inter-broker-password: MzA1NVFhM0Vzaw==
-  system-user-password: UTlZVTJYdHFPaA==
+  client-passwords: SDZQSWtrRFF1UA==
+  controller-password: bXNnelh2Y2FtUA==
+  inter-broker-password: NGNRcUNwUXRoVA==
+  system-user-password: SDZQSWtrRFF1UA==
 type: Opaque
 
 ---
@@ -201,9 +201,9 @@ type: Opaque
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kafka-kraft
+  name: example-backend-kafka-kraft
   labels:
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
@@ -215,10 +215,10 @@ metadata:
     static: annotation
   namespace: default
 data:
-  cluster-id: eFdWQ1NtWmNEYXpwWVZrRUpzV09iZQ==
-  controller-0-id: TnBlMmo2YlJJUTRnNU54cWNiaGs2aA==
-  controller-1-id: cHI3dGZ2Tzg5U1V1ZEdWb3JVVnk1cg==
-  controller-2-id: OEdaVmdhYmVFNVVlQkFSQUlaOE40eQ==
+  cluster-id: SXF3U0dZSDdvT3FaT3JXODBZSXF3bA==
+  controller-0-id: OEkxNTFrMHZtS09xOWhESUR3N1BkQg==
+  controller-1-id: Vm1oYU5POXRKRnlESVFjTExwRWN1MA==
+  controller-2-id: ZnJYTGtveXlKWkdPb3pwOWRibmFvaw==
 type: Opaque
 
 ---
@@ -226,10 +226,10 @@ type: Opaque
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kafka-controller-configuration
+  name: example-backend-kafka-controller-configuration
   labels:
     app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
@@ -245,7 +245,7 @@ data:
   server.properties: |-
     advertised.listeners=CLIENT://advertised-address-placeholder:9092,INTERNAL://advertised-address-placeholder:9094
     controller.listener.names=CONTROLLER
-    controller.quorum.bootstrap.servers=kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9093,kafka-controller-1.kafka-controller-headless.default.svc.cluster.local:9093,kafka-controller-2.kafka-controller-headless.default.svc.cluster.local:9093
+    controller.quorum.bootstrap.servers=example-backend-kafka-controller-0.example-backend-kafka-controller-headless.default.svc.cluster.local:9093,example-backend-kafka-controller-1.example-backend-kafka-controller-headless.default.svc.cluster.local:9093,example-backend-kafka-controller-2.example-backend-kafka-controller-headless.default.svc.cluster.local:9093
     inter.broker.listener.name=INTERNAL
     listener.name.client.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required user_user1="password-placeholder-0";
     listener.name.client.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
@@ -270,10 +270,10 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-controller-headless
+  name: example-backend-kafka-controller-headless
   labels:
     app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
@@ -303,7 +303,7 @@ spec:
   publishNotReadyAddresses: true
   selector:
     app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
   type: ClusterIP
@@ -313,10 +313,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka
+  name: example-backend-kafka
   labels:
     app.kubernetes.io/component: kafka
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
@@ -335,7 +335,7 @@ spec:
       protocol: TCP
       targetPort: client
   selector:
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
   sessionAffinity: None
@@ -346,10 +346,10 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: kafka-controller
+  name: example-backend-kafka-controller
   labels:
     app.kubernetes.io/component: controller-eligible
-    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
@@ -367,23 +367,23 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: controller-eligible
-      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/instance: example-backend-kafka
       app.kubernetes.io/name: kafka
       app.kubernetes.io/part-of: kafka
-  serviceName: kafka-controller-headless
+  serviceName: example-backend-kafka-controller-headless
   template:
     metadata:
       labels:
         app.kubernetes.io/component: controller-eligible
-        app.kubernetes.io/instance: kafka
+        app.kubernetes.io/instance: example-backend-kafka
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: kafka
         app.kubernetes.io/part-of: kafka
         app.kubernetes.io/version: 4.0.0
         helm.sh/chart: kafka-32.3.14
       annotations:
-        checksum/configuration: 9264fa66a09d53954e652d5e89ad0673c1199eebbf0f451374f2eefc15cc8d37
-        checksum/secret: 6d7970d83d557f2c2f3c3fe831a2bc60a7932bf38d67ab09ae40147ec395e72c
+        checksum/configuration: 4e9d4c2d4a6b5fda44bd64fc9170aa5caecb19923e17251a0a6ef091f5f5a510
+        checksum/secret: ff9a1516b260748f6db1cfa99009d10a450f2befa6442ea228f6993f23550dd0
     spec:
       affinity:
         nodeAffinity: null
@@ -394,7 +394,7 @@ spec:
                 labelSelector:
                   matchLabels:
                     app.kubernetes.io/component: controller-eligible
-                    app.kubernetes.io/instance: kafka
+                    app.kubernetes.io/instance: example-backend-kafka
                     app.kubernetes.io/name: kafka
                 topologyKey: kubernetes.io/hostname
               weight: 1
@@ -413,7 +413,7 @@ spec:
             - name: KAFKA_KRAFT_CLUSTER_ID
               valueFrom:
                 secretKeyRef:
-                  name: kafka-kraft
+                  name: example-backend-kafka-kraft
                   key: cluster-id
             - name: KAFKA_KRAFT_BOOTSTRAP_SCRAM_USERS
               value: "true"
@@ -565,7 +565,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: KAFKA_FULLNAME
-              value: kafka
+              value: example-backend-kafka
             - name: CLUSTER_DOMAIN
               value: cluster.local
             - name: KAFKA_VOLUME_DIR
@@ -575,23 +575,23 @@ spec:
             - name: KAFKA_MIN_ID
               value: "0"
             - name: KAFKA_CONTROLLER_SVC_NAME
-              value: kafka-controller-headless
+              value: example-backend-kafka-controller-headless
             - name: KAFKA_CONTROLLER_PORT
               value: "9093"
             - name: KAFKA_CONTROLLER_0_DIR_ID
               valueFrom:
                 secretKeyRef:
-                  name: kafka-kraft
+                  name: example-backend-kafka-kraft
                   key: controller-0-id
             - name: KAFKA_CONTROLLER_1_DIR_ID
               valueFrom:
                 secretKeyRef:
-                  name: kafka-kraft
+                  name: example-backend-kafka-kraft
                   key: controller-1-id
             - name: KAFKA_CONTROLLER_2_DIR_ID
               valueFrom:
                 secretKeyRef:
-                  name: kafka-kraft
+                  name: example-backend-kafka-kraft
                   key: controller-2-id
             - name: KAFKA_CLIENT_USERS
               value: user1
@@ -658,11 +658,11 @@ spec:
           type: RuntimeDefault
         supplementalGroups: []
         sysctls: []
-      serviceAccountName: kafka
+      serviceAccountName: example-backend-kafka
       volumes:
         - name: kafka-configmaps
           configMap:
-            name: kafka-controller-configuration
+            name: example-backend-kafka-controller-configuration
         - name: kafka-secret-config
           emptyDir: {}
         - name: kafka-config
@@ -675,7 +675,7 @@ spec:
           projected:
             sources:
               - secret:
-                  name: kafka-user-passwords
+                  name: example-backend-kafka-user-passwords
         - name: logs
           emptyDir: {}
   updateStrategy:

@@ -65,7 +65,7 @@ export class HelmChart<TValues = any> extends Component {
     return new Promise((resolve, reject) => {
       const args = [
         'template',
-        this.name,
+        this.fullName,
         chartPath,
         '--values', valuesPath,
         '--include-crds',
