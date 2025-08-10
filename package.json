@@ -47,9 +47,9 @@
     "jest-junit": "^16",
     "kubernetes-models": "4.5.0",
     "projen": "^0.95.0",
-    "ts-jest": "^29.4.0",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "peerDependencies": {
     "kubernetes-models": "^4.5.0"
