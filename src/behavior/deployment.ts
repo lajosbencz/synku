@@ -1,5 +1,5 @@
 import { Deployment, StatefulSet } from 'kubernetes-models/apps/v1';
-import { ResourceRequirements } from 'kubernetes-models/v1';
+import { IResourceRequirements } from 'kubernetes-models/v1';
 import { Behavior } from '../behavior';
 
 
@@ -23,7 +23,7 @@ export function matchLabels(labels: Record<string, string>): Behavior {
   };
 }
 
-export function defaultResources(req: ResourceRequirements): Behavior {
+export function defaultResources(req: IResourceRequirements): Behavior {
   return component => {
     component.findAll(Deployment, StatefulSet).forEach(resource => {
       resource.spec?.template.spec?.containers.forEach(container => {
