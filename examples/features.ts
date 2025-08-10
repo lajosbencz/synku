@@ -1,6 +1,13 @@
 import * as k8s from 'kubernetes-models';
-import { Release, behavior } from '../lib/index.js';
+import { Behavior, IComponent, Release, behavior } from '../src/index.js';
+import { KafkaChart } from './kafka-chart.js';
 
+const debug: Behavior = function (component: IComponent): void {
+  console.log(`${component.fullName}`);
+  component.findAll().forEach(resource => {
+    console.log(`  ${resource.apiVersion}:${resource.kind}`);
+  });
+}
 
 // create root object
 const release = Release.new("example");
@@ -23,6 +30,16 @@ release.component('ui').behavior(behavior.simpleApp({
 
 // create backend component
 release.component('backend', backend => {
+
+  const kafkaChart = new KafkaChart({
+    initContainers: [
+      {
+        image: 'foobar',
+        command: ['echo'],
+        args: ['foobar'],
+      },
+    ],
+  }, 'kafka', backend);
 
   // create queue component nested under backend
   backend.component('queue', queue => {
@@ -125,6 +142,9 @@ release
     }
   });
 
+// release.behavior(debug);
+
 
 // write synthesized resources
-release.write(process.stdout);
+// release.synth().catch(console.error);
+release.write(process.stdout).catch(console.error);

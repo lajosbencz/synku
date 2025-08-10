@@ -1,32 +1,462 @@
-# example-ui
-apiVersion: apps/v1
-kind: Deployment
+# example-backend-kafka
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
 metadata:
+  name: kafka-broker
+  labels:
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
   annotations:
     static: annotation
-  labels:
-    static: label
-    synku/component: example-ui
-    synku/release: example
-  name: example-ui
+  namespace: default
 spec:
-  replicas: 2
-  revisionHistoryLimit: 5
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 9092
+        - port: 9094
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: broker
+      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/part-of: kafka
+  policyTypes:
+    - Ingress
+    - Egress
+
+---
+# example-backend-kafka
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kafka-controller
+  labels:
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+spec:
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 9093
+        - port: 9092
+        - port: 9094
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: controller-eligible
+      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/part-of: kafka
+  policyTypes:
+    - Ingress
+    - Egress
+
+---
+# example-backend-kafka
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: kafka-broker
+  labels:
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+spec:
+  maxUnavailable: 1
   selector:
     matchLabels:
-      example-component: example-ui
-      example-release: example
+      app.kubernetes.io/component: broker
+      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/part-of: kafka
+
+---
+# example-backend-kafka
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: kafka-controller
+  labels:
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller-eligible
+      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/part-of: kafka
+
+---
+# example-backend-kafka
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kafka-provisioning
+  labels:
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+automountServiceAccountToken: false
+
+---
+# example-backend-kafka
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kafka
+  labels:
+    app.kubernetes.io/component: kafka
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+automountServiceAccountToken: false
+
+---
+# example-backend-kafka
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kafka-user-passwords
+  labels:
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+data:
+  client-passwords: UTlZVTJYdHFPaA==
+  controller-password: NmtlMmtmYUNaZw==
+  inter-broker-password: MzA1NVFhM0Vzaw==
+  system-user-password: UTlZVTJYdHFPaA==
+type: Opaque
+
+---
+# example-backend-kafka
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kafka-kraft
+  labels:
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+data:
+  cluster-id: eFdWQ1NtWmNEYXpwWVZrRUpzV09iZQ==
+  controller-0-id: TnBlMmo2YlJJUTRnNU54cWNiaGs2aA==
+  controller-1-id: cHI3dGZ2Tzg5U1V1ZEdWb3JVVnk1cg==
+  controller-2-id: OEdaVmdhYmVFNVVlQkFSQUlaOE40eQ==
+type: Opaque
+
+---
+# example-backend-kafka
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-controller-configuration
+  labels:
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+data:
+  server.properties: |-
+    advertised.listeners=CLIENT://advertised-address-placeholder:9092,INTERNAL://advertised-address-placeholder:9094
+    controller.listener.names=CONTROLLER
+    controller.quorum.bootstrap.servers=kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9093,kafka-controller-1.kafka-controller-headless.default.svc.cluster.local:9093,kafka-controller-2.kafka-controller-headless.default.svc.cluster.local:9093
+    inter.broker.listener.name=INTERNAL
+    listener.name.client.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required user_user1="password-placeholder-0";
+    listener.name.client.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
+    listener.name.client.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
+    listener.name.controller.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="controller_user" password="controller-password-placeholder" user_controller_user="controller-password-placeholder" user_user1="password-placeholder-0";
+    listener.name.controller.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="controller_user" password="controller-password-placeholder";
+    listener.name.controller.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="controller_user" password="controller-password-placeholder";
+    listener.name.internal.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="inter_broker_user" password="interbroker-password-placeholder" user_inter_broker_user="interbroker-password-placeholder" user_user1="password-placeholder-0";
+    listener.name.internal.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
+    listener.name.internal.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
+    listener.security.protocol.map=CONTROLLER:SASL_PLAINTEXT,CLIENT:SASL_PLAINTEXT,INTERNAL:SASL_PLAINTEXT
+    listeners=CLIENT://:9092,INTERNAL://:9094,CONTROLLER://:9093
+    log.dir=/bitnami/kafka/data
+    logs.dir=/opt/bitnami/kafka/logs
+    process.roles=controller,broker
+    sasl.enabled.mechanisms=PLAIN,SCRAM-SHA-256,SCRAM-SHA-512
+    sasl.mechanism.controller.protocol=PLAIN
+    sasl.mechanism.inter.broker.protocol=PLAIN
+
+---
+# example-backend-kafka
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-controller-headless
+  labels:
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+    - name: tcp-interbroker
+      port: 9094
+      protocol: TCP
+      targetPort: interbroker
+    - name: tcp-client
+      port: 9092
+      protocol: TCP
+      targetPort: client
+    - name: tcp-controller
+      port: 9093
+      protocol: TCP
+      targetPort: controller
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+  type: ClusterIP
+
+---
+# example-backend-kafka
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app.kubernetes.io/component: kafka
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+spec:
+  ports:
+    - name: tcp-client
+      nodePort: null
+      port: 9092
+      protocol: TCP
+      targetPort: client
+  selector:
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+# example-backend-kafka
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka-controller
+  labels:
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/instance: kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.3.14
+    static: label
+    synku/component: example-backend-kafka
+    synku/release: example
+  annotations:
+    static: annotation
+  namespace: default
+spec:
+  podManagementPolicy: Parallel
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller-eligible
+      app.kubernetes.io/instance: kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/part-of: kafka
+  serviceName: kafka-controller-headless
   template:
     metadata:
       labels:
-        synku/app: example-ui
+        app.kubernetes.io/component: controller-eligible
+        app.kubernetes.io/instance: kafka
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kafka
+        app.kubernetes.io/part-of: kafka
+        app.kubernetes.io/version: 4.0.0
+        helm.sh/chart: kafka-32.3.14
+      annotations:
+        checksum/configuration: 9264fa66a09d53954e652d5e89ad0673c1199eebbf0f451374f2eefc15cc8d37
+        checksum/secret: 6d7970d83d557f2c2f3c3fe831a2bc60a7932bf38d67ab09ae40147ec395e72c
     spec:
+      affinity:
+        nodeAffinity: null
+        podAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: controller-eligible
+                    app.kubernetes.io/instance: kafka
+                    app.kubernetes.io/name: kafka
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+      automountServiceAccountToken: false
       containers:
-        - image: custom-ui:latest
-          name: ui
+        - name: kafka
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: -XX:InitialRAMPercentage=75 -XX:MaxRAMPercentage=75
+            - name: KAFKA_CFG_PROCESS_ROLES
+              value: controller,broker
+            - name: KAFKA_INITIAL_CONTROLLERS_FILE
+              value: /shared/initial-controllers.txt
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: KAFKA_KRAFT_CLUSTER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-kraft
+                  key: cluster-id
+            - name: KAFKA_KRAFT_BOOTSTRAP_SCRAM_USERS
+              value: "true"
+            - name: KAFKA_CLIENT_USERS
+              value: user1
+            - name: KAFKA_CLIENT_PASSWORDS_FILE
+              value: /opt/bitnami/kafka/config/secrets/client-passwords
+            - name: KAFKA_INTER_BROKER_USER
+              value: inter_broker_user
+            - name: KAFKA_INTER_BROKER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/inter-broker-password
+            - name: KAFKA_CONTROLLER_USER
+              value: controller_user
+            - name: KAFKA_CONTROLLER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/controller-password
+          image: docker.io/bitnami/kafka:4.0.0-debian-12-r10
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - -f
+                - kafka
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
           ports:
-            - containerPort: 3000
-              protocol: TCP
+            - name: controller
+              containerPort: 9093
+            - name: client
+              containerPort: 9092
+            - name: interbroker
+              containerPort: 9094
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: controller
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 100m
@@ -34,40 +464,246 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/kafka
+            - name: logs
+              mountPath: /opt/bitnami/kafka/logs
+            - name: kafka-config
+              mountPath: /opt/bitnami/kafka/config/server.properties
+              subPath: server.properties
+            - name: tmp
+              mountPath: /tmp
+            - name: init-shared
+              mountPath: /shared
+            - name: kafka-sasl
+              mountPath: /opt/bitnami/kafka/config/secrets
+              readOnly: true
+      enableServiceLinks: true
+      hostIPC: false
+      hostNetwork: false
+      initContainers:
+        - name: prepare-config
+          args:
+            - -ec
+            - |
+              . /opt/bitnami/scripts/libkafka.sh
+              configure_kafka_sasl() {
+                  # Replace placeholders with passwords
+                  replace_in_file "$KAFKA_CONF_FILE" "interbroker-password-placeholder" "$KAFKA_INTER_BROKER_PASSWORD"
+                  replace_in_file "$KAFKA_CONF_FILE" "controller-password-placeholder" "$KAFKA_CONTROLLER_PASSWORD"
+                  read -r -a passwords <<< "$(tr ',;' ' ' <<<"${KAFKA_CLIENT_PASSWORDS:-}")"
+                  for ((i = 0; i < ${#passwords[@]}; i++)); do
+                      replace_in_file "$KAFKA_CONF_FILE" "password-placeholder-${i}\"" "${passwords[i]}\""
+                  done
+              }
 
----
-# example-ui
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    static: annotation
-  labels:
-    static: label
-    synku/component: example-ui
-    synku/release: example
-  name: example-ui
-spec:
-  ports:
-    - port: 80
-      targetPort: 3000
-  selector:
-    example-component: example-ui
-    example-release: example
-  type: ClusterIP
+              cp /configmaps/server.properties $KAFKA_CONF_FILE
+
+              # Get pod ID and role, last and second last fields in the pod name respectively
+              POD_ID="${MY_POD_NAME##*-}"
+              POD_ROLE="${MY_POD_NAME%-*}"; POD_ROLE="${POD_ROLE##*-}"
+
+              # Configure node.id
+              ID=$((POD_ID + KAFKA_MIN_ID))
+              [[ -f "/bitnami/kafka/data/meta.properties" ]] && ID="$(grep "node.id" /bitnami/kafka/data/meta.properties | awk -F '=' '{print $2}')"
+              kafka_server_conf_set "node.id" "$ID"
+              # Configure initial controllers
+              if [[ "controller" =~ "$POD_ROLE" ]]; then
+                  INITIAL_CONTROLLERS=()
+                  for ((i = 0; i < 3; i++)); do
+                      var="KAFKA_CONTROLLER_${i}_DIR_ID"; DIR_ID="${!var}"
+                      [[ $i -eq $POD_ID ]] && [[ -f "/bitnami/kafka/data/meta.properties" ]] && DIR_ID="$(grep "directory.id" /bitnami/kafka/data/meta.properties | awk -F '=' '{print $2}')"
+                      INITIAL_CONTROLLERS+=("${i}@${KAFKA_FULLNAME}-${POD_ROLE}-${i}.${KAFKA_CONTROLLER_SVC_NAME}.${MY_POD_NAMESPACE}.svc.${CLUSTER_DOMAIN}:${KAFKA_CONTROLLER_PORT}:${DIR_ID}")
+                  done
+                  echo "${INITIAL_CONTROLLERS[*]}" | awk -v OFS=',' '{$1=$1}1' > /shared/initial-controllers.txt
+              fi
+              replace_in_file "$KAFKA_CONF_FILE" "advertised-address-placeholder" "${MY_POD_NAME}.${KAFKA_FULLNAME}-${POD_ROLE}-headless.${MY_POD_NAMESPACE}.svc.${CLUSTER_DOMAIN}"
+              sasl_env_vars=(
+                KAFKA_CLIENT_PASSWORDS
+                KAFKA_INTER_BROKER_PASSWORD
+                KAFKA_INTER_BROKER_CLIENT_SECRET
+                KAFKA_CONTROLLER_PASSWORD
+                KAFKA_CONTROLLER_CLIENT_SECRET
+              )
+              for env_var in "${sasl_env_vars[@]}"; do
+                  file_env_var="${env_var}_FILE"
+                  if [[ -n "${!file_env_var:-}" ]]; then
+                      if [[ -r "${!file_env_var:-}" ]]; then
+                          export "${env_var}=$(< "${!file_env_var}")"
+                          unset "${file_env_var}"
+                      else
+                          warn "Skipping export of '${env_var}'. '${!file_env_var:-}' is not readable."
+                      fi
+                  fi
+              done
+              configure_kafka_sasl
+              if [[ -f /secret-config/server-secret.properties ]]; then
+                  cat /secret-config/server-secret.properties >> $KAFKA_CONF_FILE
+              fi
+          command:
+            - /bin/bash
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KAFKA_FULLNAME
+              value: kafka
+            - name: CLUSTER_DOMAIN
+              value: cluster.local
+            - name: KAFKA_VOLUME_DIR
+              value: /bitnami/kafka
+            - name: KAFKA_CONF_FILE
+              value: /config/server.properties
+            - name: KAFKA_MIN_ID
+              value: "0"
+            - name: KAFKA_CONTROLLER_SVC_NAME
+              value: kafka-controller-headless
+            - name: KAFKA_CONTROLLER_PORT
+              value: "9093"
+            - name: KAFKA_CONTROLLER_0_DIR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-kraft
+                  key: controller-0-id
+            - name: KAFKA_CONTROLLER_1_DIR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-kraft
+                  key: controller-1-id
+            - name: KAFKA_CONTROLLER_2_DIR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-kraft
+                  key: controller-2-id
+            - name: KAFKA_CLIENT_USERS
+              value: user1
+            - name: KAFKA_CLIENT_PASSWORDS_FILE
+              value: /opt/bitnami/kafka/config/secrets/client-passwords
+            - name: KAFKA_INTER_BROKER_USER
+              value: inter_broker_user
+            - name: KAFKA_INTER_BROKER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/inter-broker-password
+            - name: KAFKA_CONTROLLER_USER
+              value: controller_user
+            - name: KAFKA_CONTROLLER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/controller-password
+          image: docker.io/bitnami/kafka:4.0.0-debian-12-r10
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add: []
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/kafka
+            - name: kafka-config
+              mountPath: /config
+            - name: kafka-configmaps
+              mountPath: /configmaps
+            - name: kafka-secret-config
+              mountPath: /secret-config
+            - name: tmp
+              mountPath: /tmp
+            - name: init-shared
+              mountPath: /shared
+            - name: kafka-sasl
+              mountPath: /opt/bitnami/kafka/config/secrets
+              readOnly: true
+        - args:
+            - foobar
+          command:
+            - echo
+          image: foobar
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        seccompProfile:
+          type: RuntimeDefault
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: kafka
+      volumes:
+        - name: kafka-configmaps
+          configMap:
+            name: kafka-controller-configuration
+        - name: kafka-secret-config
+          emptyDir: {}
+        - name: kafka-config
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: init-shared
+          emptyDir: {}
+        - name: kafka-sasl
+          projected:
+            sources:
+              - secret:
+                  name: kafka-user-passwords
+        - name: logs
+          emptyDir: {}
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 8Gi
 
 ---
 # example-backend-queue
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  annotations:
-    static: annotation
+  name: example-backend-queue
   labels:
     static: label
     synku/component: example-backend-queue
     synku/release: example
-  name: example-backend-queue
+  annotations:
+    static: annotation
 spec:
   selector:
     matchLabels:
@@ -77,8 +713,8 @@ spec:
   template:
     spec:
       containers:
-        - image: mqtt
-          name: queue
+        - name: queue
+          image: mqtt
           resources:
             limits:
               cpu: 100m
@@ -92,13 +728,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    static: annotation
+  name: example-backend-queue
   labels:
     static: label
     synku/component: example-backend-queue
     synku/release: example
-  name: example-backend-queue
+  annotations:
+    static: annotation
 spec:
   ports:
     - port: 80
@@ -113,13 +749,13 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    static: annotation
+  name: example-backend-worker
   labels:
     static: label
     synku/component: example-backend-worker
     synku/release: example
-  name: example-backend-worker
+  annotations:
+    static: annotation
 spec:
   replicas: 2
   selector:
@@ -129,8 +765,8 @@ spec:
   template:
     spec:
       containers:
-        - image: custom-worker
-          name: worker
+        - name: worker
+          image: custom-worker
           resources:
             limits:
               cpu: 100m
@@ -138,62 +774,3 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
-
----
-# example-backend-api
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations:
-    static: annotation
-  labels:
-    static: label
-    synku/component: example-backend-api
-    synku/release: example
-  name: example-backend-api
-spec:
-  replicas: 2
-  revisionHistoryLimit: 5
-  selector:
-    matchLabels:
-      example-component: example-backend-api
-      example-release: example
-  template:
-    metadata:
-      labels:
-        synku/app: example-backend-api
-    spec:
-      containers:
-        - image: custom-api:latest
-          name: api
-          ports:
-            - containerPort: 8080
-              protocol: TCP
-          resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
-
----
-# example-backend-api
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    static: annotation
-  labels:
-    static: label
-    synku/component: example-backend-api
-    synku/release: example
-  name: example-backend-api
-spec:
-  ports:
-    - port: 80
-      targetPort: 8080
-  selector:
-    example-component: example-backend-api
-    example-release: example
-  type: ClusterIP

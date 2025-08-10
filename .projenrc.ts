@@ -25,10 +25,17 @@ const project = new TypeScriptProject({
   deps: [
     'yaml@^2.8.0',
     'tsx@^4.20.3',
+    'commander@^12.1.0',
   ],
   peerDeps: [
     'kubernetes-models@^4.5.0',
   ],
+
+  gitIgnoreOptions: {
+    ignorePatterns: [
+      '.synku-temp*',
+    ],
+  },
 
   releaseToNpm: true,
   npmRegistryUrl: 'https://registry.npmjs.org/',
@@ -38,6 +45,7 @@ const project = new TypeScriptProject({
     ignorePatterns: [
       '/docs/',
       '/examples/',
+      '.synku-temp*',
     ],
   },
 });

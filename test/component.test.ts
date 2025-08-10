@@ -1,8 +1,30 @@
-
 import { ConfigMap, Secret } from 'kubernetes-models/v1';
-import { Component } from '../src/component';
+import { Component, resourceEquality } from '../src/component';
 
 describe('Component', () => {
+
+  describe('resourceEquality', () => {
+    it('should match instance types', () => {
+      const a = new ConfigMap({ data: { foo: 'bar' } });
+      const b = new ConfigMap({ data: { baz: 'bax' } });
+      expect(resourceEquality(a, b)).toBeTruthy();
+    });
+    it('should match any types', () => {
+      const a = { apiVersion: ConfigMap.apiVersion, kind: ConfigMap.kind, data: { foo: 'bar' } };
+      const b = { apiVersion: ConfigMap.apiVersion, kind: ConfigMap.kind, data: { baz: 'bax' } };
+      expect(resourceEquality(a, b)).toBeTruthy();
+    });
+    it('should not match instance types', () => {
+      const a = new ConfigMap({ data: { foo: 'bar' } });
+      const b = new Secret({ stringData: { baz: 'bax' } });
+      expect(resourceEquality(a, b)).toBeFalsy();
+    });
+    it('should not match any types', () => {
+      const a = { apiVersion: ConfigMap.apiVersion, kind: ConfigMap.kind, data: { foo: 'bar' } };
+      const b = { apiVersion: Secret.apiVersion, kind: Secret.kind, stringData: { baz: 'bax' } };
+      expect(resourceEquality(a, b)).toBeFalsy();
+    });
+  });
 
   describe('simple', () => {
     const config = {
@@ -32,17 +54,23 @@ describe('Component', () => {
       expect(component.findAll(Secret, ConfigMap).length).toEqual(2);
     });
     component.behavior(bc => bc.findAll().forEach(r => r.name = bc.name));
-    const syn = component.synth();
-    it('should return synthesis', () => {
+
+    it('should return synthesis', async () => {
+      const syn = await component.synth();
       expect(syn).toBeDefined();
       expect(syn instanceof Array).toBeTruthy();
       expect(syn.length).toEqual(1);
     });
-    const [synComponent, synResources] = syn[0];
-    it('should include component in synthesis', () => {
+
+    it('should include component in synthesis', async () => {
+      const syn = await component.synth();
+      const [synComponent] = syn[0];
       expect(synComponent).toEqual(component);
     });
-    it('should return modified resources in synthesis', () => {
+
+    it('should return modified resources in synthesis', async () => {
+      const syn = await component.synth();
+      const [, synResources] = syn[0];
       expect(synResources instanceof Array).toBeTruthy();
       expect(synResources.length).toEqual(2);
       expect(synResources[0].data.foo).toEqual('bar');
@@ -80,17 +108,18 @@ describe('Component', () => {
   });
 
   describe('behaviours', () => {
-    it('should behave', () => {
+    it('should behave', async () => {
       const r = new Component(undefined, 'r');
       r.resource(ConfigMap, {
         data: { foo: 'bar' },
       });
       r.behavior(c => c.find(ConfigMap).data!.baz = 'bax');
-      const [[_, [sr]]] = r.synth();
+      const syn = await r.synth();
+      const [[_, [sr]]] = syn;
       expect(sr.data.foo).toEqual('bar');
       expect(sr.data.baz).toEqual('bax');
     });
-    it('should inherit', () => {
+    it('should inherit', async () => {
       const r = new Component(undefined, 'r');
       r.component('c', c => {
         c.component('l', l => {
@@ -100,7 +129,8 @@ describe('Component', () => {
         });
       });
       r.behavior(bc => bc.findAll(ConfigMap).forEach(br => br.data!.baz = 'bax'));
-      const [[_, [sr]]] = r.synth();
+      const syn = await r.synth();
+      const [[_, [sr]]] = syn;
       expect(sr.data.foo).toEqual('bar');
       expect(sr.data.baz).toEqual('bax');
     });

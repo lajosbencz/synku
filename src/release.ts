@@ -30,7 +30,8 @@ export class Release extends Component {
     return release;
   }
 
-  public write(stream: NodeJS.WritableStream): void {
-    yaml(this.synth(), stream);
+  public async write(stream: NodeJS.WritableStream): Promise<void> {
+    const synthResult = await this.synth();
+    yaml(synthResult, stream);
   }
 }

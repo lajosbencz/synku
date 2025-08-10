@@ -1,39 +1,55 @@
 #!/usr/bin/env node
 
-import { spawn } from 'child_process';
-import path from 'path';
+import { Command } from 'commander';
+import { chartCommand } from './commands/chart';
+import { executeFile } from './commands/execute';
 
-async function main() {
-  const file = process.argv[2];
-  if (!file) {
-    console.error('Usage: synku <file.ts>');
-    process.exit(1);
-  }
+const program = new Command();
 
-  // Find tsx binary - it should be in node_modules/.bin relative to our package
-  // In the compiled lib directory, we need to go up to find node_modules
-  const tsxBinary = path.resolve(__dirname, '../../node_modules/.bin/tsx');
+program
+  .name('synku')
+  .description('TypeScript-first Kubernetes deployment tool with Helm chart integration')
+  .version('0.0.0')
+  .helpOption('-h, --help', 'Display help for command');
 
-  // Resolve the user file path
-  const userFile = path.resolve(process.cwd(), file);
+// Add chart command
+program.addCommand(chartCommand);
 
-  // Execute the TypeScript file using tsx
-  const child = spawn(tsxBinary, [userFile], {
-    stdio: 'inherit',
-    env: process.env,
+// Handle file execution (default behavior when no subcommand is provided)
+program
+  .argument('[file]', 'TypeScript file to execute')
+  .action(async (file?: string) => {
+    if (!file) {
+      program.help();
+      return;
+    }
+
+    try {
+      await executeFile(file);
+    } catch (error) {
+      console.error('Failed to execute file:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
   });
 
-  child.on('close', (code) => {
-    process.exit(code || 0);
-  });
+// Enhanced help examples
+program.addHelpText('after', `
+Examples:
+  Execute a TypeScript project file:
+    $ synku ./project.ts
 
-  child.on('error', (error) => {
-    console.error('Failed to execute file:', error.message);
-    process.exit(1);
-  });
-}
+  Generate chart types from OCI registry:
+    $ synku chart oci://registry-1.docker.io/bitnamicharts/postgresql --name PostgreSQL
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(2);
-});
+  Generate chart types from HTTP URL:
+    $ synku chart https://charts.bitnami.com/bitnami/nginx-15.1.0.tgz --name Nginx
+
+  Generate chart types from local chart:
+    $ synku chart ./my-local-chart --name MyChart
+
+  Generate with custom output:
+    $ synku chart oci://registry/chart --name MyChart --output custom-chart.ts
+`);
+
+// Parse command line arguments
+program.parse();

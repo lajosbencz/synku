@@ -1,6 +1,13 @@
 import { Behavior } from './behavior';
 import { Constructor, InstanceType, DeepPartial } from './types';
 
+export function resourceEquality(a: any, b: any): boolean {
+  if (a.apiVersion && a.kind) {
+    return a.apiVersion === b.apiVersion && a.kind === b.kind;
+  }
+  return b instanceof a;
+}
+
 export type ComponentInit = (component: IComponent) => void;
 
 export interface IComponent {
@@ -17,7 +24,8 @@ export interface IComponent {
   findAll<T extends readonly Constructor<any>[]>(...resourceTypes: T): InstanceType<T[number]>[];
   behavior(behavior: Behavior): IComponent;
   getBehaviors(): Behavior[];
-  synth(): [IComponent, any[]][];
+  init(): void;
+  synth(): Promise<[IComponent, any[]][]>;
 }
 
 export class Component implements IComponent {
@@ -29,10 +37,13 @@ export class Component implements IComponent {
 
   constructor(parent: IComponent | undefined, public readonly name: string) {
     this._parent = parent;
+    this._parent?.children.push(this);
     this.init();
   }
 
-  protected init() { }
+  init(): void {
+    // Default implementation does nothing
+  }
 
   get root(): IComponent {
     let root: IComponent = this;
@@ -55,11 +66,11 @@ export class Component implements IComponent {
     let node: IComponent | undefined = this;
     do {
       if (fullName !== '') {
-        fullName = `${node.name}-${fullName}`;
+        fullName = `${node!.name}-${fullName}`;
       } else {
-        fullName = node.name;
+        fullName = node!.name;
       }
-      node = node.parent;
+      node = node!.parent;
     } while (node);
     return fullName;
   }
@@ -67,23 +78,24 @@ export class Component implements IComponent {
   component(name: string, init?: ComponentInit): IComponent {
     const component = new Component(this, name);
     init?.(component);
-    this.children.push(component);
     return component;
   }
 
   resource<T>(resourceType: Constructor<T>, draft: DeepPartial<T>): IComponent {
-    (draft as any).metadata ??= {};
     const resource = new resourceType(draft);
     this._resources.push(resource);
     return this;
   }
 
   find<T = any>(resourceType: Constructor<T>): T {
-    return this._resources.find(r => r instanceof resourceType);
+    return this._resources.find(r => resourceEquality(resourceType, r));
   }
 
   findAll(...resourceTypes: Constructor<any>[]): any[] {
-    return this._resources.filter(r => resourceTypes.length < 1 || resourceTypes.some(rt => r instanceof rt));
+    if (resourceTypes.length < 1) {
+      return this._resources;
+    }
+    return this._resources.filter(r => resourceTypes.some(rt => resourceEquality(r, rt)));
   }
 
   behavior(behavior: Behavior): IComponent {
@@ -95,15 +107,18 @@ export class Component implements IComponent {
     return [...this._parent?.getBehaviors() ?? [], ...this._behaviors].reverse();
   }
 
-  synth(): [IComponent, any[]][] {
+  async synth(): Promise<[IComponent, any[]][]> {
     const list: [IComponent, any[]][] = [];
-    this.getBehaviors().forEach(behavior => behavior(this));
     if (this._resources.length > 0) {
       list.push([this, this._resources]);
     }
     for (const child of this.children) {
-      list.push(...child.synth());
+      const childResults = await child.synth();
+      list.push(...childResults);
     }
+    this.getBehaviors().forEach(behavior => {
+      behavior(this);
+    });
     return list;
   }
 }

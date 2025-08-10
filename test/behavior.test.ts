@@ -1,22 +1,35 @@
-import { Deployment } from 'kubernetes-models/apps/v1';
 import { ConfigMap } from 'kubernetes-models/v1';
-import { chain } from '../src/behavior';
+import { defaultLabels, defaultAnnotations } from '../src/behavior/metadata';
 import { Component } from '../src/component';
 
 describe('Behavior', () => {
-  it('should chain', () => {
+
+  it('should add default labels', async () => {
     const component = new Component(undefined, 'test');
-    component
-      .resource(ConfigMap, {})
-      .resource(Deployment, {});
-    component.behavior(chain(
-      c => c.findAll().forEach(r => r.metadata.name = c.fullName),
-      c => c.findAll().forEach(r => r.metadata.annotations = { foo: `${r.metadata.name}-bar` }),
-    ));
-    const [[, resources]] = component.synth();
-    resources.forEach(r => {
-      expect(r.metadata.name).toEqual('test');
-      expect(r.metadata.annotations.foo).toEqual('test-bar');
+    component.resource(ConfigMap, {
+      data: { test: 'value' },
+    });
+    component.behavior(defaultLabels({ 'my-label': 'my-value' }));
+
+    const syn = await component.synth();
+    const [[, resources]] = syn;
+    resources.forEach((r: any) => {
+      expect(r.metadata.labels).toEqual({ 'my-label': 'my-value' });
     });
   });
+
+  it('should add default annotations', async () => {
+    const component = new Component(undefined, 'test');
+    component.resource(ConfigMap, {
+      data: { test: 'value' },
+    });
+    component.behavior(defaultAnnotations({ 'my-annotation': 'my-value' }));
+
+    const syn = await component.synth();
+    const [[, resources]] = syn;
+    resources.forEach((r: any) => {
+      expect(r.metadata.annotations).toEqual({ 'my-annotation': 'my-value' });
+    });
+  });
+
 });

@@ -82,6 +82,11 @@
       "type": "peer"
     },
     {
+      "name": "commander",
+      "version": "^12.1.0",
+      "type": "runtime"
+    },
+    {
       "name": "tsx",
       "version": "^4.20.3",
       "type": "runtime"

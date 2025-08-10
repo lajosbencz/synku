@@ -1,29 +1,34 @@
 import { ConfigMap } from 'kubernetes-models/v1';
-import { Release } from '../src/index';
+import { Release } from '../src/release';
 
 describe('Release', () => {
-  it('should add labels', () => {
-    const release = Release.new('test');
-    release.resource(ConfigMap, {
-      data: {
-        foo: 'bar',
-      },
-    });
-    release.component('sub', sub => {
-      sub.resource(ConfigMap, {
-        data: {
-          baz: 'bax',
-        },
+
+  it('should create', async () => {
+    const release = Release.new('test', r => {
+      r.component('c1', c => {
+        c.resource(ConfigMap, {
+          data: { test: 'value' },
+        });
+      });
+      r.component('c2', c => {
+        c.resource(ConfigMap, {
+          data: { test2: 'value2' },
+        });
       });
     });
-    const [[, [r1]], [, [r2]]] = release.synth();
-    expect(r1).toBeDefined();
-    expect(r1.data.foo).toEqual('bar');
-    expect(r1.metadata.labels[`${Release.LABEL_PREFIX}release`]).toEqual('test');
-    expect(r1.metadata.labels[`${Release.LABEL_PREFIX}component`]).toEqual('test');
-    expect(r2).toBeDefined();
-    expect(r2.data.baz).toEqual('bax');
-    expect(r2.metadata.labels[`${Release.LABEL_PREFIX}release`]).toEqual('test');
-    expect(r2.metadata.labels[`${Release.LABEL_PREFIX}component`]).toEqual('test-sub');
+
+    const syn = await release.synth();
+    const [[, [r1]], [, [r2]]] = syn;
+    expect(r1.metadata.name).toEqual('test-c1');
+    expect(r2.metadata.name).toEqual('test-c2');
+    expect(r1.metadata.labels).toEqual({
+      'synku/release': 'test',
+      'synku/component': 'test-c1',
+    });
+    expect(r2.metadata.labels).toEqual({
+      'synku/release': 'test',
+      'synku/component': 'test-c2',
+    });
   });
+
 });

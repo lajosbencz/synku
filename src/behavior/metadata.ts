@@ -20,7 +20,7 @@ export function defaultLabels(labels: Record<string, string>): Behavior {
       resource.metadata = {
         ...resource.metadata,
         labels: {
-          ...resource.metadata.labels,
+          ...resource.metadata?.labels,
           ...labels,
         },
       };
@@ -34,7 +34,7 @@ export function defaultAnnotations(annotations: Record<string, string>): Behavio
       resource.metadata = {
         ...resource.metadata,
         annotations: {
-          ...resource.metadata.annotations,
+          ...resource.metadata?.annotations,
           ...annotations,
         },
       };
