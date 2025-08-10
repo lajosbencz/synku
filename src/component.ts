@@ -105,16 +105,14 @@ export class Component implements IComponent {
     const ComponentType = componentTypeOrInit as ComponentConstructor<T> | ComponentConstructorWithArgs<T>;
 
     try {
-      // Try as ComponentConstructor (name, parent)
       if (args.length === 0 || (args.length === 1 && typeof args[0] === 'function')) {
+        // Try as ComponentConstructor (name, parent)
         const init = args[0] as ComponentInit | undefined;
         const component = new (ComponentType as ComponentConstructor<T>)(name, this);
         init?.(component);
         return component;
-      }
-      
-      // Try as ComponentConstructorWithArgs (...args, name, parent)
-      else {
+      } else {
+        // Try as ComponentConstructorWithArgs (...args, name, parent)
         // Find optional init function from the end of arguments
         let constructorArgs = [...args];
         let init: ComponentInit | undefined;
