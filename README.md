@@ -35,7 +35,7 @@ Release.new("project", (release) => {
         configMap.data!.baz = "bax";
       });
     })
-    .resource(k8s.v1.ConfigMap, {
+    .manifest(k8s.v1.ConfigMap, {
       data: {
         foo: "bar",
       },
@@ -72,7 +72,7 @@ Release.new("project", (release) => {
         configMap.data!.baz = "bax";
       });
     })
-    .resource(k8s.v1.ConfigMap, {
+    .manifest(k8s.v1.ConfigMap, {
       data: {
         foo: "bar",
       },

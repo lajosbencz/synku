@@ -5,11 +5,11 @@ import { yaml } from './writer';
 
 export const releaseLabels: Behavior = component => component
   .findAll()
-  .forEach(resource =>
-    resource.metadata = {
-      ...resource.metadata,
+  .forEach(manifest =>
+    manifest.metadata = {
+      ...manifest.metadata,
       labels: {
-        ...resource.metadata.labels,
+        ...manifest.metadata.labels,
         [`${Release.LABEL_PREFIX}release`]: component.root.name,
         [`${Release.LABEL_PREFIX}component`]: component.fullName,
       },

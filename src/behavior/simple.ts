@@ -40,7 +40,7 @@ export function simpleApp(options: DefaultAppOptions): Behavior {
     };
     component
       .behavior(behavior.defaultName())
-      .resource(Deployment, {
+      .manifest(Deployment, {
         spec: {
           replicas,
           revisionHistoryLimit,
@@ -66,7 +66,7 @@ export function simpleApp(options: DefaultAppOptions): Behavior {
           },
         },
       })
-      .resource(Service, {
+      .manifest(Service, {
         spec: {
           type: 'ClusterIP',
           selector: {

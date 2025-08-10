@@ -109,19 +109,19 @@ export class Chart<TValues = any> extends Component {
 
     for (const doc of documents) {
       try {
-        const resource = yaml.parse(doc);
-        if (resource && resource.kind && resource.apiVersion) {
+        const manifest = yaml.parse(doc);
+        if (manifest && manifest.kind && manifest.apiVersion) {
           // Try to find the corresponding kubernetes-models class
-          const ResourceClass = this.findKubernetesModelClass(resource.apiVersion, resource.kind);
-          if (ResourceClass) {
-            this.resource(ResourceClass, resource);
+          const manifestClass = this.findKubernetesModelClass(manifest.apiVersion, manifest.kind);
+          if (manifestClass) {
+            this.manifest(manifestClass, manifest);
           } else {
             // Fall back to raw object if no typed class found
-            this.resource(Object, resource);
+            this.manifest(Object, manifest);
           }
         }
       } catch (error) {
-        console.warn(`Failed to parse resource document: ${error}`);
+        console.warn(`Failed to parse manifest: ${error}`);
       }
     }
   }

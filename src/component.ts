@@ -1,7 +1,7 @@
 import { Behavior } from './behavior';
 import { Constructor, InstanceType, DeepPartial } from './types';
 
-export function resourceEquality(a: any, b: any): boolean {
+export function manifestEquality(a: any, b: any): boolean {
   if (a.apiVersion && a.kind) {
     return a.apiVersion === b.apiVersion && a.kind === b.kind;
   }
@@ -25,13 +25,13 @@ export interface IComponent {
   readonly name: string;
   readonly fullName: string;
   component(name: string, init?: ComponentInit): IComponent;
-  component<T extends IComponent>(name: string, componentType: ComponentConstructor<T>, init?: ComponentInit): T;
-  component<T extends IComponent>(name: string, componentType: ComponentConstructorWithArgs<T>, ...args: any[]): T;
-  resource<T>(resourceType: Constructor<T>, draft: DeepPartial<T>): IComponent;
-  find<T = any>(resourceType: Constructor<T>): T;
+  component<T extends IComponent>(name: string, type: ComponentConstructor<T>, init?: ComponentInit): T;
+  component<T extends IComponent>(name: string, type: ComponentConstructorWithArgs<T>, ...args: any[]): T;
+  manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent;
+  find<T = any>(type: Constructor<T>): T;
   findAll(): any[];
-  findAll<T>(resourceType: Constructor<T>): T[];
-  findAll<T extends readonly Constructor<any>[]>(...resourceTypes: T): InstanceType<T[number]>[];
+  findAll<T>(type: Constructor<T>): T[];
+  findAll<T extends readonly Constructor<any>[]>(...types: T): InstanceType<T[number]>[];
   behavior(behavior: Behavior): IComponent;
   getBehaviors(): Behavior[];
   init(): void;
@@ -42,7 +42,7 @@ export class Component implements IComponent {
 
   protected _parent?: IComponent;
   protected _children: IComponent[] = [];
-  protected _resources: any[] = [];
+  protected _manifests: any[] = [];
   protected _behaviors: Behavior[] = [];
 
   constructor(parent: IComponent | undefined, public readonly name: string) {
@@ -133,21 +133,21 @@ export class Component implements IComponent {
     }
   }
 
-  resource<T>(resourceType: Constructor<T>, draft: DeepPartial<T>): IComponent {
-    const resource = new resourceType(draft);
-    this._resources.push(resource);
+  manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent {
+    const manifest = new type(draft);
+    this._manifests.push(manifest);
     return this;
   }
 
-  find<T = any>(resourceType: Constructor<T>): T {
-    return this._resources.find(r => resourceEquality(resourceType, r));
+  find<T = any>(type: Constructor<T>): T {
+    return this._manifests.find(r => manifestEquality(type, r));
   }
 
-  findAll(...resourceTypes: Constructor<any>[]): any[] {
-    if (resourceTypes.length < 1) {
-      return this._resources;
+  findAll(...types: Constructor<any>[]): any[] {
+    if (types.length < 1) {
+      return this._manifests;
     }
-    return this._resources.filter(r => resourceTypes.some(rt => resourceEquality(r, rt)));
+    return this._manifests.filter(r => types.some(rt => manifestEquality(r, rt)));
   }
 
   behavior(behavior: Behavior): IComponent {
@@ -161,8 +161,8 @@ export class Component implements IComponent {
 
   async synth(): Promise<[IComponent, any[]][]> {
     const list: [IComponent, any[]][] = [];
-    if (this._resources.length > 0) {
-      list.push([this, this._resources]);
+    if (this._manifests.length > 0) {
+      list.push([this, this._manifests]);
     }
     for (const child of this.children) {
       const childResults = await child.synth();

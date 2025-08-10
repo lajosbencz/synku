@@ -1,5 +1,5 @@
 import { ConfigMap, Secret } from 'kubernetes-models/v1';
-import { Component, resourceEquality } from '../src/component';
+import { Component, manifestEquality } from '../src/component';
 
 describe('Component', () => {
 
@@ -7,22 +7,22 @@ describe('Component', () => {
     it('should match instance types', () => {
       const a = new ConfigMap({ data: { foo: 'bar' } });
       const b = new ConfigMap({ data: { baz: 'bax' } });
-      expect(resourceEquality(a, b)).toBeTruthy();
+      expect(manifestEquality(a, b)).toBeTruthy();
     });
     it('should match any types', () => {
       const a = { apiVersion: ConfigMap.apiVersion, kind: ConfigMap.kind, data: { foo: 'bar' } };
       const b = { apiVersion: ConfigMap.apiVersion, kind: ConfigMap.kind, data: { baz: 'bax' } };
-      expect(resourceEquality(a, b)).toBeTruthy();
+      expect(manifestEquality(a, b)).toBeTruthy();
     });
     it('should not match instance types', () => {
       const a = new ConfigMap({ data: { foo: 'bar' } });
       const b = new Secret({ stringData: { baz: 'bax' } });
-      expect(resourceEquality(a, b)).toBeFalsy();
+      expect(manifestEquality(a, b)).toBeFalsy();
     });
     it('should not match any types', () => {
       const a = { apiVersion: ConfigMap.apiVersion, kind: ConfigMap.kind, data: { foo: 'bar' } };
       const b = { apiVersion: Secret.apiVersion, kind: Secret.kind, stringData: { baz: 'bax' } };
-      expect(resourceEquality(a, b)).toBeFalsy();
+      expect(manifestEquality(a, b)).toBeFalsy();
     });
   });
 
@@ -39,8 +39,8 @@ describe('Component', () => {
     };
     const component = new Component(undefined, 'test');
     component
-      .resource(ConfigMap, config)
-      .resource(Secret, secret);
+      .manifest(ConfigMap, config)
+      .manifest(Secret, secret);
 
     it('should be named', () => {
       expect(component.name).toEqual('test');
@@ -110,7 +110,7 @@ describe('Component', () => {
   describe('behaviours', () => {
     it('should behave', async () => {
       const r = new Component(undefined, 'r');
-      r.resource(ConfigMap, {
+      r.manifest(ConfigMap, {
         data: { foo: 'bar' },
       });
       r.behavior(c => c.find(ConfigMap).data!.baz = 'bax');
@@ -123,7 +123,7 @@ describe('Component', () => {
       const r = new Component(undefined, 'r');
       r.component('c', c => {
         c.component('l', l => {
-          l.resource(ConfigMap, {
+          l.manifest(ConfigMap, {
             data: { foo: 'bar' },
           });
         });

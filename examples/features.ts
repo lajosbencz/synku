@@ -4,8 +4,8 @@ import { KafkaChart, KafkaChartValues } from './kafka-chart.js';
 
 const debug: Behavior = function (component: IComponent): void {
   console.log(`${component.fullName}`);
-  component.findAll().forEach(resource => {
-    console.log(`  ${resource.apiVersion}:${resource.kind}`);
+  component.findAll().forEach(manifest => {
+    console.log(`  ${manifest.apiVersion}:${manifest.kind}`);
   });
 }
 
@@ -48,7 +48,7 @@ release.component('backend', backend => {
 
   // create queue component nested under backend
   backend.component('queue', queue => {
-    queue.resource(k8s.apps.v1.StatefulSet, {
+    queue.manifest(k8s.apps.v1.StatefulSet, {
       spec: {
         template: {
           spec: {
@@ -61,7 +61,7 @@ release.component('backend', backend => {
         },
       },
     })
-    queue.resource(k8s.v1.Service, {
+    queue.manifest(k8s.v1.Service, {
       spec: {
         type: 'ClusterIP',
         ports: [{ port: 80, targetPort: 8080 }],
@@ -71,7 +71,7 @@ release.component('backend', backend => {
 
   // create worker component nested under backend
   backend.component('worker', queue => {
-    queue.resource(k8s.apps.v1.Deployment, {
+    queue.manifest(k8s.apps.v1.Deployment, {
       spec: {
         template: {
           spec: {

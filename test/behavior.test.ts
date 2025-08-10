@@ -6,7 +6,7 @@ describe('Behavior', () => {
 
   it('should add default labels', async () => {
     const component = new Component(undefined, 'test');
-    component.resource(ConfigMap, {
+    component.manifest(ConfigMap, {
       data: { test: 'value' },
     });
     component.behavior(defaultLabels({ 'my-label': 'my-value' }));
@@ -20,7 +20,7 @@ describe('Behavior', () => {
 
   it('should add default annotations', async () => {
     const component = new Component(undefined, 'test');
-    component.resource(ConfigMap, {
+    component.manifest(ConfigMap, {
       data: { test: 'value' },
     });
     component.behavior(defaultAnnotations({ 'my-annotation': 'my-value' }));

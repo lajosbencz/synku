@@ -6,12 +6,12 @@ describe('Release', () => {
   it('should create', async () => {
     const release = Release.new('test', r => {
       r.component('c1', c => {
-        c.resource(ConfigMap, {
+        c.manifest(ConfigMap, {
           data: { test: 'value' },
         });
       });
       r.component('c2', c => {
-        c.resource(ConfigMap, {
+        c.manifest(ConfigMap, {
           data: { test2: 'value2' },
         });
       });

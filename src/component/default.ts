@@ -41,7 +41,7 @@ export function simpleApp(parent: IComponent, options: DefaultAppOptions): IComp
     [matchLabelKey!]: component.fullName,
   };
   component
-    .resource(Deployment, {
+    .manifest(Deployment, {
       spec: {
         replicas,
         revisionHistoryLimit,
@@ -67,7 +67,7 @@ export function simpleApp(parent: IComponent, options: DefaultAppOptions): IComp
         },
       },
     })
-    .resource(Service, {
+    .manifest(Service, {
       spec: {
         type: 'ClusterIP',
         selector: {

@@ -18,9 +18,9 @@ export function sortMapEntries(a: Pair, b: Pair) {
 
 export function yaml(records: [IComponent, any[]][], output: NodeJS.WritableStream = process.stdout): void {
   let totalResourceCount = 0;
-  for (const [component, resources] of records) {
-    for (const resource of resources) {
-      const yamlString = stringify(resource, {
+  for (const [component, manifests] of records) {
+    for (const manifest of manifests) {
+      const yamlString = stringify(manifest, {
         indent: 2,
         lineWidth: 0,
         minContentWidth: 0,

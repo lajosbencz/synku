@@ -3,10 +3,10 @@ import { Behavior } from '../behavior';
 
 export function defaultNamespace(namespace: string): Behavior {
   return component => {
-    component.findAll().forEach(resource => {
-      resource.metadata = {
+    component.findAll().forEach(manifest => {
+      manifest.metadata = {
         namespace,
-        ...resource.metadata,
+        ...manifest.metadata,
       };
     });
   };
@@ -17,10 +17,10 @@ export function defaultName(prefix?: string): Behavior {
     prefix = `${prefix}-`;
   }
   return component => {
-    component.findAll().forEach(resource => {
-      resource.metadata = {
+    component.findAll().forEach(manifest => {
+      manifest.metadata = {
         name: `${prefix ?? ''}${component.fullName}`,
-        ...resource.metadata,
+        ...manifest.metadata,
       };
     });
   };
@@ -28,11 +28,11 @@ export function defaultName(prefix?: string): Behavior {
 
 export function defaultLabels(labels: Record<string, string>): Behavior {
   return component => {
-    component.findAll().forEach(resource => {
-      resource.metadata = {
-        ...resource.metadata,
+    component.findAll().forEach(manifest => {
+      manifest.metadata = {
+        ...manifest.metadata,
         labels: {
-          ...resource.metadata?.labels,
+          ...manifest.metadata?.labels,
           ...labels,
         },
       };
@@ -42,11 +42,11 @@ export function defaultLabels(labels: Record<string, string>): Behavior {
 
 export function defaultAnnotations(annotations: Record<string, string>): Behavior {
   return component => {
-    component.findAll().forEach(resource => {
-      resource.metadata = {
-        ...resource.metadata,
+    component.findAll().forEach(manifest => {
+      manifest.metadata = {
+        ...manifest.metadata,
         annotations: {
-          ...resource.metadata?.annotations,
+          ...manifest.metadata?.annotations,
           ...annotations,
         },
       };
