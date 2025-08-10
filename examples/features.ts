@@ -1,6 +1,6 @@
 import * as k8s from 'kubernetes-models';
 import { Behavior, IComponent, Release, behavior } from '../src/index.js';
-import { KafkaChart } from './kafka-chart.js';
+import { KafkaChart, KafkaChartValues } from './kafka-chart.js';
 
 const debug: Behavior = function (component: IComponent): void {
   console.log(`${component.fullName}`);
@@ -9,11 +9,14 @@ const debug: Behavior = function (component: IComponent): void {
   });
 }
 
+const namespace = 'example-ns';
+
 // create root object
 const release = Release.new("example");
 
 // attach common behaviors
 release
+  .behavior(behavior.defaultNamespace(namespace))
   .behavior(behavior.defaultLabels({
     'static': 'label',
   }))
@@ -32,14 +35,16 @@ release.component('ui').behavior(behavior.simpleApp({
 release.component('backend', backend => {
 
   backend.component('kafka', KafkaChart, {
+    namespaceOverride: namespace,
     initContainers: [
       {
         image: 'foobar',
+        name: 'foobar',
         command: ['echo'],
         args: ['foobar'],
       },
     ],
-  });
+  } as KafkaChartValues);
 
   // create queue component nested under backend
   backend.component('queue', queue => {

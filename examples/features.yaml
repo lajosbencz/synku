@@ -16,7 +16,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 spec:
   egress:
     - {}
@@ -53,7 +53,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 spec:
   egress:
     - {}
@@ -91,7 +91,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 spec:
   maxUnavailable: 1
   selector:
@@ -120,7 +120,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 spec:
   maxUnavailable: 1
   selector:
@@ -147,7 +147,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 automountServiceAccountToken: false
 
 ---
@@ -168,7 +168,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 automountServiceAccountToken: false
 
 ---
@@ -188,12 +188,12 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 data:
-  client-passwords: d0h4ck9nVk5RSw==
-  controller-password: UFZnTkNzckt6Sg==
-  inter-broker-password: R1lqTmY2Vmo4aA==
-  system-user-password: d0h4ck9nVk5RSw==
+  client-passwords: WWg0WkhTRkp4Zw==
+  controller-password: U1NjbUJVM3lOZg==
+  inter-broker-password: RWFLaFFqaFJhSQ==
+  system-user-password: WWg0WkhTRkp4Zw==
 type: Opaque
 
 ---
@@ -213,12 +213,12 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 data:
-  cluster-id: Tjg4RUQyUW1FYWI2MkdEN0ZIRVBUVA==
-  controller-0-id: eTRZNkRFb21NcG5MUGNaNmx2MDNpUQ==
-  controller-1-id: RWM2Zk5YTDdyTldKUHh2a2ZxU0d4UA==
-  controller-2-id: ajRqWGFQUDVXUzVNejNsUmhlejNMaA==
+  cluster-id: bzhldTY2Qkh1UG1oNGxLMEFwZEpudw==
+  controller-0-id: a1lONmtrcHFTQlZQbUFmTUNuUFJQZg==
+  controller-1-id: R2pOVFpKSGUxU0Z5djM1THF6QVdqZw==
+  controller-2-id: bHY2dnd4NFA1WGtrZXJmRU1BSEFUUA==
 type: Opaque
 
 ---
@@ -240,12 +240,12 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 data:
   server.properties: |-
     advertised.listeners=CLIENT://advertised-address-placeholder:9092,INTERNAL://advertised-address-placeholder:9094
     controller.listener.names=CONTROLLER
-    controller.quorum.bootstrap.servers=example-backend-kafka-controller-0.example-backend-kafka-controller-headless.default.svc.cluster.local:9093,example-backend-kafka-controller-1.example-backend-kafka-controller-headless.default.svc.cluster.local:9093,example-backend-kafka-controller-2.example-backend-kafka-controller-headless.default.svc.cluster.local:9093
+    controller.quorum.bootstrap.servers=example-backend-kafka-controller-0.example-backend-kafka-controller-headless.example-ns.svc.cluster.local:9093,example-backend-kafka-controller-1.example-backend-kafka-controller-headless.example-ns.svc.cluster.local:9093,example-backend-kafka-controller-2.example-backend-kafka-controller-headless.example-ns.svc.cluster.local:9093
     inter.broker.listener.name=INTERNAL
     listener.name.client.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required user_user1="password-placeholder-0";
     listener.name.client.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
@@ -284,7 +284,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 spec:
   clusterIP: None
   ports:
@@ -326,7 +326,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 spec:
   ports:
     - name: tcp-client
@@ -360,7 +360,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
-  namespace: default
+  namespace: example-ns
 spec:
   podManagementPolicy: Parallel
   replicas: 3
@@ -382,8 +382,8 @@ spec:
         app.kubernetes.io/version: 4.0.0
         helm.sh/chart: kafka-32.3.14
       annotations:
-        checksum/configuration: 4e9d4c2d4a6b5fda44bd64fc9170aa5caecb19923e17251a0a6ef091f5f5a510
-        checksum/secret: 26fc5065b3e66e5f9ee8a06e45f9ff2ada1276189b6434f070b3bdfd391746da
+        checksum/configuration: bbd38bcc40cd588bfdb2803611eaa96ef358452c8f7a7f2ed6f08bbc34adefe4
+        checksum/secret: 57aafec1d6f1bb15aeba85a743102f744692ae4a3590d66058bd810ffef52a14
     spec:
       affinity:
         nodeAffinity: null
@@ -646,7 +646,8 @@ spec:
             - name: kafka-sasl
               mountPath: /opt/bitnami/kafka/config/secrets
               readOnly: true
-        - args:
+        - name: foobar
+          args:
             - foobar
           command:
             - echo
@@ -704,6 +705,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
+  namespace: example-ns
 spec:
   selector:
     matchLabels:
@@ -735,6 +737,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
+  namespace: example-ns
 spec:
   ports:
     - port: 80
@@ -756,6 +759,7 @@ metadata:
     synku/release: example
   annotations:
     static: annotation
+  namespace: example-ns
 spec:
   replicas: 2
   selector:
