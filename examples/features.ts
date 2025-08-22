@@ -34,8 +34,7 @@ release.component('ui').behavior(behavior.simpleApp({
 // create backend component
 release.component('backend', backend => {
 
-  backend.component('kafka', KafkaChart, {
-    namespaceOverride: namespace,
+  backend.component(new KafkaChart('kafka', {
     initContainers: [
       {
         image: 'foobar',
@@ -44,7 +43,7 @@ release.component('backend', backend => {
         args: ['foobar'],
       },
     ],
-  } as KafkaChartValues);
+  }, namespace));
 
   // create queue component nested under backend
   backend.component('queue', queue => {

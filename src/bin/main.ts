@@ -4,12 +4,14 @@ import { Command } from 'commander';
 import { chartCommand } from './commands/chart';
 import { executeFile } from './commands/execute';
 
+import * as pkg from '../../package.json';
+
 const program = new Command();
 
 program
   .name('synku')
   .description('TypeScript-first Kubernetes deployment tool with Helm chart integration')
-  .version('0.0.0')
+  .version(pkg.version)
   .helpOption('-h, --help', 'Display help for command');
 
 // Add chart command

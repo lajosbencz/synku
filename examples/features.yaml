@@ -153,10 +153,10 @@ metadata:
     static: annotation
   namespace: example-ns
 data:
-  client-passwords: bkpZWURxVWxzQw==
-  controller-password: cEFEWFdDQmpxZg==
-  inter-broker-password: bHQ3RnVZOG5BSQ==
-  system-user-password: bkpZWURxVWxzQw==
+  client-passwords: eGtZOFdqVDMwUw==
+  controller-password: cWozd0E2VU5XOA==
+  inter-broker-password: SWdqaXk2UnBtdg==
+  system-user-password: eGtZOFdqVDMwUw==
 type: Opaque
 
 ---
@@ -178,10 +178,10 @@ metadata:
     static: annotation
   namespace: example-ns
 data:
-  cluster-id: cjRiTGl3THpMdzdRdkdjU0dpaTVjMg==
-  controller-0-id: WlB1SmZ0OFBKcXVISVRYMFRUNmNReA==
-  controller-1-id: SEpPS1FNbXozUmdoY0dCMEk0VjRzRg==
-  controller-2-id: WnBETFNPUFBxdDlxT1FrbVk5c2FteA==
+  cluster-id: MEp1VHBBenFRbEZxTTZFV1B2ZWxnRA==
+  controller-0-id: S2dka2VXeEhlSUk2ZmoySlhLakw2bg==
+  controller-1-id: cDFTWXFsU1ppTkJOd1JPNG02bTlGZQ==
+  controller-2-id: QjRJT1F6N3R4cmxaSmx3aThxM0NWRg==
 type: Opaque
 
 ---
@@ -345,7 +345,7 @@ spec:
         helm.sh/chart: kafka-32.4.2
       annotations:
         checksum/configuration: c8c243475b27bfbd77ceb19b7123b8955702b333d24aafcbc01375fb31740e78
-        checksum/secret: 0b9f3b58c1a828af8aff5ad916be295caae495a768587e20a621718203d712b1
+        checksum/secret: 9515dda2255d99ac46fc8e5848ccdb94cf839456686eafe54d876eee958b5f27
     spec:
       affinity:
         podAntiAffinity:

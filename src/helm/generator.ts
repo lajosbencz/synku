@@ -195,8 +195,8 @@ export class TypeScriptGenerator {
  * @source ${sourceUrl}
  */
 export class ${className} extends helm.Chart<${interfaceName}> {
-  constructor(values: ${interfaceName}, name?: string, parent?: IComponent, namespace?: string) {
-    super('${sourceUrl}', values, name || '${metadata.name}', parent, namespace);
+  constructor(name: string, values: ${interfaceName}, namespace: string = 'default', parent?: IComponent) {
+    super('${sourceUrl}', name, values, namespace, parent);
   }
 }`;
   }

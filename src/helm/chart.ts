@@ -13,12 +13,12 @@ export class Chart<TValues = any> extends Component {
 
   constructor(
     private chartUrl: string,
+    name: string,
     private values: TValues,
-    name?: string,
-    parent?: IComponent,
     private namespace: string = 'default',
+    parent?: IComponent,
   ) {
-    super(parent, name || 'chart');
+    super(parent, name);
   }
 
   private async fetchAndRender(): Promise<void> {
@@ -72,7 +72,8 @@ export class Chart<TValues = any> extends Component {
         chartPath,
         '--values', valuesPath,
         '--namespace', this.namespace,
-        '--include-crds',
+        '--skip-crds',
+        '--skip-tests',
       ];
 
       const helm = spawn('helm', args, {

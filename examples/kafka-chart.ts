@@ -967,12 +967,12 @@ export interface KafkaChartValues {
 /**
  * KafkaChart - Helm chart wrapper
  * Apache Kafka is a distributed streaming platform designed to build real-time pipelines and can be used as a message broker or as a replacement for a log aggregation solution for big data applications.
- * @version 32.3.14
+ * @version 32.4.2
  * @see https://bitnami.com
  * @source oci://registry-1.docker.io/bitnamicharts/kafka
  */
 export class KafkaChart extends helm.Chart<KafkaChartValues> {
-  constructor(values: KafkaChartValues, name?: string, parent?: IComponent, namespace?: string) {
-    super('oci://registry-1.docker.io/bitnamicharts/kafka', values, name || 'kafka', parent, namespace);
+  constructor(name: string, values: KafkaChartValues, namespace: string = 'default', parent?: IComponent) {
+    super('oci://registry-1.docker.io/bitnamicharts/kafka', name, values, namespace, parent);
   }
 }

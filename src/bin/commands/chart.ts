@@ -9,7 +9,7 @@ export const chartCommand = new Command('chart')
   .description('Generate TypeScript types from Helm chart')
   .argument('<source>', 'Chart source (OCI, HTTP, Git, or local path)')
   .requiredOption('--name <name>', 'Chart class name')
-  .option('--version <version>', 'Chart version')
+  .option('--chart-version <version>', 'Chart version')
   .option('--output <file>', 'Output file path (default: <name>-chart.ts)')
   .option('--username <user>', 'Registry username')
   .option('--password <pass>', 'Registry password')
@@ -27,15 +27,15 @@ Examples:
     $ synku chart ./local-chart --name LocalChart
 
   Generate with custom options:
-    $ synku chart oci://registry/chart --name MyChart --version 1.0.0 --output my-chart.ts
+    $ synku chart oci://registry/chart --name MyChart --chart-version 1.0.0 --output my-chart.ts
 `)
   .action(async (source: string, options: ChartCommandOptions) => {
-    const { name, version, output, username, password, registryConfig, insecure } = options;
+    const { name, chartVersion, output, username, password, registryConfig, insecure } = options;
 
     const outputFile = output || `${name.toLowerCase()}-chart.ts`;
 
     const fetchOptions: FetchOptions = {
-      version,
+      version: chartVersion,
       username,
       password,
       registryConfig,
@@ -84,7 +84,7 @@ Examples:
 
 interface ChartCommandOptions {
   name: string;
-  version?: string;
+  chartVersion?: string;
   output?: string;
   username?: string;
   password?: string;

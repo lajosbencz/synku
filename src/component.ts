@@ -8,14 +8,14 @@ export function manifestEquality(a: any, b: any): boolean {
   return b instanceof a;
 }
 
-export type ComponentInit = (component: IComponent) => void;
+export type ComponentInit<T extends IComponent = IComponent> = (component: T) => void;
 
 export interface ComponentConstructor<T extends IComponent = IComponent> {
-  new (name: string, parent?: IComponent): T;
+  new(name: string, parent?: IComponent): T;
 }
 
 export interface ComponentConstructorWithArgs<T extends IComponent = IComponent, TArgs extends any[] = any[]> {
-  new (...args: TArgs): T;
+  new(...args: TArgs): T;
 }
 
 export interface IComponent {
@@ -24,9 +24,10 @@ export interface IComponent {
   readonly children: IComponent[];
   readonly name: string;
   readonly fullName: string;
+  setParent(parent: IComponent): void;
+  removeChild(child: IComponent): void;
   component(name: string, init?: ComponentInit): IComponent;
-  component<T extends IComponent>(name: string, type: ComponentConstructor<T>, init?: ComponentInit): T;
-  component<T extends IComponent>(name: string, type: ComponentConstructorWithArgs<T>, ...args: any[]): T;
+  component<T extends IComponent>(component: T, init?: ComponentInit<T>): T;
   manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent;
   find<T = any>(type: Constructor<T>): T;
   findAll(): any[];
@@ -85,52 +86,30 @@ export class Component implements IComponent {
     return fullName;
   }
 
+  setParent(parent?: IComponent): void {
+    if (this._parent && this._parent !== parent) {
+      this._parent.removeChild(this);
+    }
+    this._parent = parent;
+  }
+
+  removeChild(child: IComponent): void {
+    this._children = this._children.filter(e => e !== child);
+  }
+
   component(name: string, init?: ComponentInit): IComponent;
-  component<T extends IComponent>(name: string, componentType: ComponentConstructor<T>, init?: ComponentInit): T;
-  component<T extends IComponent>(name: string, componentType: ComponentConstructorWithArgs<T>, ...args: any[]): T;
-  component<T extends IComponent>(
-    name: string,
-    componentTypeOrInit?: ComponentConstructor<T> | ComponentConstructorWithArgs<T> | ComponentInit,
-    ...args: any[]
-  ): IComponent | T {
-    // Simple component creation with name and init
-    if (!componentTypeOrInit || typeof componentTypeOrInit === 'function' && componentTypeOrInit.length === 1) {
-      const init = componentTypeOrInit as ComponentInit | undefined;
-      const component = new Component(this, name);
-      init?.(component);
-      return component;
+  component<T extends IComponent>(component: T, init?: ComponentInit<T>): T;
+  component(nameOrComponent: string | IComponent, init?: ComponentInit): IComponent {
+    let component: IComponent;
+    if (typeof nameOrComponent === 'string') {
+      component = new Component(this, nameOrComponent);
+    } else {
+      component = nameOrComponent as IComponent;
+      component.setParent(this);
+      this._children.push(component);
     }
-
-    // Component creation with constructor
-    const ComponentType = componentTypeOrInit as ComponentConstructor<T> | ComponentConstructorWithArgs<T>;
-
-    try {
-      if (args.length === 0 || (args.length === 1 && typeof args[0] === 'function')) {
-        // Try as ComponentConstructor (name, parent)
-        const init = args[0] as ComponentInit | undefined;
-        const component = new (ComponentType as ComponentConstructor<T>)(name, this);
-        init?.(component);
-        return component;
-      } else {
-        // Try as ComponentConstructorWithArgs (...args, name, parent)
-        // Find optional init function from the end of arguments
-        let constructorArgs = [...args];
-        let init: ComponentInit | undefined;
-
-        // Check if last argument is an init function
-        if (constructorArgs.length > 0 && typeof constructorArgs[constructorArgs.length - 1] === 'function') {
-          init = constructorArgs.pop() as ComponentInit;
-        }
-
-        // Create the component with constructor args, name, and parent
-        const finalArgs = [...constructorArgs, name, this];
-        const component = new (ComponentType as any)(...finalArgs);
-        init?.(component);
-        return component;
-      }
-    } catch (error) {
-      throw new Error(`Failed to create component: ${error}`);
-    }
+    init?.(component);
+    return component;
   }
 
   manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent {
