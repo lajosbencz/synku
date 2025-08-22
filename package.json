@@ -57,7 +57,7 @@
   "dependencies": {
     "commander": "^12.1.0",
     "tsx": "^4.20.3",
-    "yaml": "^2.8.0"
+    "yaml": "^2.8.1"
   },
   "main": "lib/index.js",
   "license": "MIT",

@@ -1,11 +1,10 @@
 import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
 import path from 'path';
-import * as yaml from 'yaml';
+import { parse, stringify } from 'yaml';
 import { Component, IComponent } from '../component';
 import { detectChartSource, ChartFetcherFactory } from './fetcher';
 import { FetchOptions } from './types';
-
 
 export class Chart<TValues = any> extends Component {
   private tempPath?: string;
@@ -42,7 +41,10 @@ export class Chart<TValues = any> extends Component {
 
     // Create temporary values file
     const tempValuesPath = path.join(this.chartPath, '.synku-values.yaml');
-    const valuesYaml = yaml.stringify(this.values);
+    const valuesYaml = stringify(this.values, {
+      version: '1.1',
+      schema: 'yaml-1.1',
+    });
     await fs.writeFile(tempValuesPath, valuesYaml);
 
     try {
@@ -109,7 +111,9 @@ export class Chart<TValues = any> extends Component {
 
     for (const doc of documents) {
       try {
-        const manifest = yaml.parse(doc);
+        const manifest = parse(doc, {
+          version: '1.1',
+        });
         if (manifest && manifest.kind && manifest.apiVersion) {
           // Try to find the corresponding kubernetes-models class
           const manifestClass = this.findKubernetesModelClass(manifest.apiVersion, manifest.kind);

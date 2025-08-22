@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import * as yaml from 'yaml';
+import { parse } from 'yaml';
 import { ChartMetadata, GeneratedChartInfo } from './types';
 
 export interface SchemaProperty {
@@ -42,7 +42,10 @@ export class TypeScriptGenerator {
   private async parseChartMetadata(chartPath: string): Promise<ChartMetadata> {
     const chartYamlPath = path.join(chartPath, 'Chart.yaml');
     const chartYamlContent = await fs.readFile(chartYamlPath, 'utf-8');
-    return yaml.parse(chartYamlContent) as ChartMetadata;
+    return parse(chartYamlContent, {
+      version: '1.1',
+      schema: 'yaml-1.1',
+    }) as ChartMetadata;
   }
 
   private async parseValuesSchema(chartPath: string): Promise<SchemaProperty> {
@@ -62,7 +65,10 @@ export class TypeScriptGenerator {
     const valuesYamlPath = path.join(chartPath, 'values.yaml');
     try {
       const valuesContent = await fs.readFile(valuesYamlPath, 'utf-8');
-      const values = yaml.parse(valuesContent);
+      const values = parse(valuesContent, {
+        version: '1.1',
+        schema: 'yaml-1.1',
+      });
       return this.inferSchemaFromValues(values);
     } catch {
       // Return empty schema if no values file

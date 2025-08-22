@@ -21,6 +21,8 @@ export function yaml(records: [IComponent, any[]][], output: NodeJS.WritableStre
   for (const [component, manifests] of records) {
     for (const manifest of manifests) {
       const yamlString = stringify(manifest, {
+        version: '1.1',
+        schema: 'yaml-1.1',
         indent: 2,
         lineWidth: 0,
         minContentWidth: 0,
