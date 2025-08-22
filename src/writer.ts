@@ -1,6 +1,18 @@
 import { Pair, stringify } from 'yaml';
 import { IComponent } from './component';
 
+export function removeNulls(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(removeNulls);
+  } else if (obj && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj)
+        .filter(([_, v]) => v !== null && v !== undefined)
+        .map(([k, v]) => [k, removeNulls(v)])
+    );
+  }
+  return obj;
+}
 
 export function sortMapEntries(a: Pair, b: Pair) {
   const desiredOrder = ['apiVersion', 'kind', 'metadata', 'name', 'labels', 'annotations'];
@@ -20,7 +32,8 @@ export function yaml(records: [IComponent, any[]][], output: NodeJS.WritableStre
   let totalResourceCount = 0;
   for (const [component, manifests] of records) {
     for (const manifest of manifests) {
-      const yamlString = stringify(manifest, {
+      const cleanManifest = removeNulls(manifest)
+      const yamlString = stringify(cleanManifest, {
         version: '1.1',
         schema: 'yaml-1.1',
         indent: 2,
