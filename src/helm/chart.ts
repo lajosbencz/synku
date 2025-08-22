@@ -16,6 +16,7 @@ export class Chart<TValues = any> extends Component {
     private values: TValues,
     name?: string,
     parent?: IComponent,
+    private namespace: string = 'default',
   ) {
     super(parent, name || 'chart');
   }
@@ -70,6 +71,7 @@ export class Chart<TValues = any> extends Component {
         this.fullName,
         chartPath,
         '--values', valuesPath,
+        '--namespace', this.namespace,
         '--include-crds',
       ];
 

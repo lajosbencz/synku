@@ -2,43 +2,6 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: example-backend-kafka-broker
-  labels:
-    app.kubernetes.io/component: broker
-    app.kubernetes.io/instance: example-backend-kafka
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: kafka
-    app.kubernetes.io/part-of: kafka
-    app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
-    static: label
-    synku/component: example-backend-kafka
-    synku/release: example
-  annotations:
-    static: annotation
-  namespace: example-ns
-spec:
-  egress:
-    - {}
-  ingress:
-    - ports:
-        - port: 9092
-        - port: 9094
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/component: broker
-      app.kubernetes.io/instance: example-backend-kafka
-      app.kubernetes.io/name: kafka
-      app.kubernetes.io/part-of: kafka
-  policyTypes:
-    - Ingress
-    - Egress
-
----
-# example-backend-kafka
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
   name: example-backend-kafka-controller
   labels:
     app.kubernetes.io/component: controller-eligible
@@ -47,7 +10,7 @@ metadata:
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -85,7 +48,7 @@ metadata:
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -114,7 +77,7 @@ metadata:
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -141,7 +104,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -162,7 +125,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -182,7 +145,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -190,10 +153,10 @@ metadata:
     static: annotation
   namespace: example-ns
 data:
-  client-passwords: WWg0WkhTRkp4Zw==
-  controller-password: U1NjbUJVM3lOZg==
-  inter-broker-password: RWFLaFFqaFJhSQ==
-  system-user-password: WWg0WkhTRkp4Zw==
+  client-passwords: eVQzVU5semw0UA==
+  controller-password: RFByNGI0NEU4aw==
+  inter-broker-password: Vjg2dkVpOVJsaQ==
+  system-user-password: eVQzVU5semw0UA==
 type: Opaque
 
 ---
@@ -207,7 +170,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -215,10 +178,10 @@ metadata:
     static: annotation
   namespace: example-ns
 data:
-  cluster-id: bzhldTY2Qkh1UG1oNGxLMEFwZEpudw==
-  controller-0-id: a1lONmtrcHFTQlZQbUFmTUNuUFJQZg==
-  controller-1-id: R2pOVFpKSGUxU0Z5djM1THF6QVdqZw==
-  controller-2-id: bHY2dnd4NFA1WGtrZXJmRU1BSEFUUA==
+  cluster-id: Nlo3VmRtcGlwUVNwT0xkajFIZm9ZOQ==
+  controller-0-id: TXFpcnZUSHRiUHF3QWtsakx2NldLVQ==
+  controller-1-id: TjhVdHJZM1N4c0g0TkFVeE9MdTJlUQ==
+  controller-2-id: amg1U1NPOVlKQnhrODNBdFJHWjRDSw==
 type: Opaque
 
 ---
@@ -234,7 +197,7 @@ metadata:
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -278,7 +241,7 @@ metadata:
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -320,7 +283,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -354,7 +317,7 @@ metadata:
     app.kubernetes.io/name: kafka
     app.kubernetes.io/part-of: kafka
     app.kubernetes.io/version: 4.0.0
-    helm.sh/chart: kafka-32.3.14
+    helm.sh/chart: kafka-32.4.2
     static: label
     synku/component: example-backend-kafka
     synku/release: example
@@ -380,10 +343,10 @@ spec:
         app.kubernetes.io/name: kafka
         app.kubernetes.io/part-of: kafka
         app.kubernetes.io/version: 4.0.0
-        helm.sh/chart: kafka-32.3.14
+        helm.sh/chart: kafka-32.4.2
       annotations:
-        checksum/configuration: bbd38bcc40cd588bfdb2803611eaa96ef358452c8f7a7f2ed6f08bbc34adefe4
-        checksum/secret: 57aafec1d6f1bb15aeba85a743102f744692ae4a3590d66058bd810ffef52a14
+        checksum/configuration: c8c243475b27bfbd77ceb19b7123b8955702b333d24aafcbc01375fb31740e78
+        checksum/secret: be7ff60d854f1a8e7ef118332d3dedf13712c7a54459c4f2d544832005d52d18
     spec:
       affinity:
         nodeAffinity: null
