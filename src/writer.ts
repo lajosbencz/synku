@@ -8,7 +8,7 @@ export function removeNulls(obj: any): any {
     return Object.fromEntries(
       Object.entries(obj)
         .filter(([_, v]) => v !== null && v !== undefined)
-        .map(([k, v]) => [k, removeNulls(v)])
+        .map(([k, v]) => [k, removeNulls(v)]),
     );
   }
   return obj;
@@ -32,7 +32,7 @@ export function yaml(records: [IComponent, any[]][], output: NodeJS.WritableStre
   let totalResourceCount = 0;
   for (const [component, manifests] of records) {
     for (const manifest of manifests) {
-      const cleanManifest = removeNulls(manifest)
+      const cleanManifest = removeNulls(manifest);
       const yamlString = stringify(cleanManifest, {
         version: '1.1',
         schema: 'yaml-1.1',
