@@ -55,7 +55,7 @@
     "kubernetes-models": "^4.5.0"
   },
   "dependencies": {
-    "commander": "^12.1.0",
+    "commander": "^14.0.0",
     "tsx": "^4.20.3",
     "yaml": "^2.8.1"
   },

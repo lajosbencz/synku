@@ -83,7 +83,7 @@
     },
     {
       "name": "commander",
-      "version": "^12.1.0",
+      "version": "^14.0.0",
       "type": "runtime"
     },
     {
@@ -93,7 +93,7 @@
     },
     {
       "name": "yaml",
-      "version": "^2.8.0",
+      "version": "^2.8.1",
       "type": "runtime"
     }
   ],

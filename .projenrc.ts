@@ -23,9 +23,9 @@ const project = new TypeScriptProject({
     'kubernetes-models@^4.5.0',
   ],
   deps: [
-    'yaml@^2.8.0',
+    'yaml@^2.8.1',
     'tsx@^4.20.3',
-    'commander@^12.1.0',
+    'commander@^14.0.0',
   ],
   peerDeps: [
     'kubernetes-models@^4.5.0',
