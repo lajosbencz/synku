@@ -27,20 +27,19 @@ yarn add synku
 ```typescript
 // project.ts
 import * as k8s from "kubernetes-models";
-import { Release } from "synku";
-Release.new("project", (release) => {
-  release
-    .behavior((component) => {
-      component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
-        configMap.data!.baz = "bax";
-      });
-    })
-    .manifest(k8s.v1.ConfigMap, {
-      data: {
-        foo: "bar",
-      },
+import { Component } from "synku";
+
+export default new Component("project")
+  .behavior((component) => {
+    component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
+      configMap.data!.baz = "bax";
     });
-}).write(process.stdout);
+  })
+  .manifest(k8s.v1.ConfigMap, {
+    data: {
+      foo: "bar",
+    },
+  });
 ```
 
 #### Synthesize
@@ -48,7 +47,6 @@ Release.new("project", (release) => {
 ```bash
 npx synku ./project.ts
 ```
-
 
 ### Helm Charts
 
@@ -63,26 +61,25 @@ npx synku chart 'oci://registry-1.docker.io/bitnamicharts/kafka' --name Kafka --
 ```typescript
 // project.ts
 import * as k8s from "kubernetes-models";
-import { Release } from "synku";
+import { Component } from "synku";
 import { KafkaChart } from "./kafka-chart.ts";
-Release.new("project", (release) => {
-  release
-    .behavior((component) => {
-      component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
-        configMap.data!.baz = "bax";
-      });
-    })
-    .manifest(k8s.v1.ConfigMap, {
-      data: {
-        foo: "bar",
-      },
-    })
-    .component('kafka', KafkaChart, {
-      broker: {
-        persistence: {
-          enabled: false,
-        },
-      },
+
+export default new Component("project")
+  .behavior((component) => {
+    component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
+      configMap.data!.baz = "bax";
     });
-}).write(process.stdout);
+  })
+  .manifest(k8s.v1.ConfigMap, {
+    data: {
+      foo: "bar",
+    },
+  })
+  .component(new KafkaChart('namespace', 'kafka', {
+    broker: {
+      persistence: {
+        enabled: false,
+      },
+    },
+  }));
 ```
