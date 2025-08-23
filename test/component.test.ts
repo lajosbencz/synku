@@ -37,7 +37,7 @@ describe('Component', () => {
         foo: 'bar',
       },
     };
-    const component = new Component(undefined, 'test');
+    const component = new Component('test');
     component
       .manifest(ConfigMap, config)
       .manifest(Secret, secret);
@@ -78,7 +78,7 @@ describe('Component', () => {
   });
 
   describe('tree', () => {
-    const r = new Component(undefined, 'r');
+    const r = new Component('r');
     it('should have no parent', () => {
       expect(r.parent).toEqual(undefined);
     });
@@ -109,7 +109,7 @@ describe('Component', () => {
 
   describe('behaviours', () => {
     it('should behave', async () => {
-      const r = new Component(undefined, 'r');
+      const r = new Component('r');
       r.manifest(ConfigMap, {
         data: { foo: 'bar' },
       });
@@ -120,7 +120,7 @@ describe('Component', () => {
       expect(sr.data.baz).toEqual('bax');
     });
     it('should inherit', async () => {
-      const r = new Component(undefined, 'r');
+      const r = new Component('r');
       r.component('c', c => {
         c.component('l', l => {
           l.manifest(ConfigMap, {

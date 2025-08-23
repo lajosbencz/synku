@@ -15,7 +15,7 @@ export function removeNulls(obj: any): any {
 }
 
 export function sortMapEntries(a: Pair, b: Pair) {
-  const desiredOrder = ['apiVersion', 'kind', 'metadata', 'name', 'labels', 'annotations'];
+  const desiredOrder = ['apiVersion', 'kind', 'metadata', 'name', 'namespace', 'labels', 'annotations'];
   const keyA = String(a.key);
   const keyB = String(b.key);
   const idxA = desiredOrder.indexOf(keyA);
@@ -28,7 +28,7 @@ export function sortMapEntries(a: Pair, b: Pair) {
   return idxA - idxB;
 }
 
-export function yaml(records: [IComponent, any[]][], output: NodeJS.WritableStream = process.stdout): void {
+export function write(records: [IComponent, any[]][], output: NodeJS.WritableStream = process.stdout): void {
   let totalResourceCount = 0;
   for (const [component, manifests] of records) {
     for (const manifest of manifests) {

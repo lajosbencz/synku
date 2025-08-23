@@ -1,7 +1,7 @@
 import { Deployment } from 'kubernetes-models/apps/v1';
 import { ResourceRequirements, Service } from 'kubernetes-models/v1';
 import * as behavior from '../behavior/index';
-import { Component, IComponent } from '../component';
+import { IComponent } from '../component';
 import { DeepPartial } from '../types';
 
 export interface DefaultAppOptions {
@@ -36,46 +36,46 @@ export function simpleApp(parent: IComponent, options: DefaultAppOptions): IComp
     containerPort,
     matchLabelKey,
   } = { ...DefaultAppDefaultOptions, ...options };
-  const component = new Component(parent, name);
-  const matchLabels = {
-    [matchLabelKey!]: component.fullName,
-  };
-  component
-    .manifest(Deployment, {
-      spec: {
-        replicas,
-        revisionHistoryLimit,
-        selector: {
-          matchLabels,
-        },
-        template: {
-          metadata: {
-            labels: {
-              ...matchLabels,
+  return parent.component(name, component => {
+    const matchLabels = {
+      [matchLabelKey!]: component.fullName,
+    };
+    component
+      .manifest(Deployment, {
+        spec: {
+          replicas,
+          revisionHistoryLimit,
+          selector: {
+            matchLabels,
+          },
+          template: {
+            metadata: {
+              labels: {
+                ...matchLabels,
+              },
+            },
+            spec: {
+              containers: [
+                {
+                  name,
+                  image: `${image}:${tag}`,
+                  ports: [{ protocol: 'TCP', containerPort }],
+                  resources,
+                },
+              ],
             },
           },
-          spec: {
-            containers: [
-              {
-                name,
-                image: `${image}:${tag}`,
-                ports: [{ protocol: 'TCP', containerPort }],
-                resources,
-              },
-            ],
+        },
+      })
+      .manifest(Service, {
+        spec: {
+          type: 'ClusterIP',
+          selector: {
+            ...matchLabels,
           },
+          ports: [{ port, targetPort: containerPort }],
         },
-      },
-    })
-    .manifest(Service, {
-      spec: {
-        type: 'ClusterIP',
-        selector: {
-          ...matchLabels,
-        },
-        ports: [{ port, targetPort: containerPort }],
-      },
-    })
-    .behavior(behavior.defaultName());
-  return component;
+      })
+      .behavior(behavior.defaultName());
+  });
 }

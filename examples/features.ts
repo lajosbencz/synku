@@ -1,6 +1,6 @@
 import * as k8s from 'kubernetes-models';
-import { Behavior, IComponent, Release, behavior } from '../src/index.js';
-import { KafkaChart, KafkaChartValues } from './kafka-chart.js';
+import { Behavior, Component, IComponent, behavior } from '../src/index.js';
+import { KafkaChart } from './kafka-chart.js';
 
 const debug: Behavior = function (component: IComponent): void {
   console.log(`${component.fullName}`);
@@ -12,10 +12,11 @@ const debug: Behavior = function (component: IComponent): void {
 const namespace = 'example-ns';
 
 // create root object
-const release = Release.new("example");
+const release = new Component("example");
 
 // attach common behaviors
 release
+  .behavior(behavior.defaultName())
   .behavior(behavior.defaultNamespace(namespace))
   .behavior(behavior.defaultLabels({
     'static': 'label',
@@ -34,7 +35,7 @@ release.component('ui').behavior(behavior.simpleApp({
 // create backend component
 release.component('backend', backend => {
 
-  backend.component(new KafkaChart('kafka', {
+  backend.component(new KafkaChart(namespace, 'kafka', {
     initContainers: [
       {
         image: 'foobar',
@@ -43,7 +44,15 @@ release.component('backend', backend => {
         args: ['foobar'],
       },
     ],
-  }, namespace));
+  }));
+
+  const test1 = new Component('test1');
+  test1.manifest(k8s.v1.ServiceAccount, {});
+  backend.component(test1);
+
+  backend.component('test2', test2 => {
+    test2.manifest(k8s.v1.ServiceAccount, {});
+  });
 
   // create queue component nested under backend
   backend.component('queue', queue => {
@@ -148,7 +157,4 @@ release
 
 // release.behavior(debug);
 
-
-// write synthesized resources
-// release.synth().catch(console.error);
-release.write(process.stdout).catch(console.error);
+export default release;

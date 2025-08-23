@@ -5,7 +5,7 @@ import { Component } from '../src/component';
 describe('Behavior', () => {
 
   it('should add default labels', async () => {
-    const component = new Component(undefined, 'test');
+    const component = new Component('test');
     component.manifest(ConfigMap, {
       data: { test: 'value' },
     });
@@ -19,7 +19,7 @@ describe('Behavior', () => {
   });
 
   it('should add default annotations', async () => {
-    const component = new Component(undefined, 'test');
+    const component = new Component('test');
     component.manifest(ConfigMap, {
       data: { test: 'value' },
     });

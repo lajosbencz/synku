@@ -3,6 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: example-backend-kafka-controller
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: controller-eligible
     app.kubernetes.io/instance: example-backend-kafka
@@ -12,11 +13,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   egress:
     - {}
@@ -41,6 +39,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: example-backend-kafka-broker
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: broker
     app.kubernetes.io/instance: example-backend-kafka
@@ -50,11 +49,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   maxUnavailable: 1
   selector:
@@ -70,6 +66,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: example-backend-kafka-controller
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: controller-eligible
     app.kubernetes.io/instance: example-backend-kafka
@@ -79,11 +76,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   maxUnavailable: 1
   selector:
@@ -99,6 +93,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: example-backend-kafka-provisioning
+  namespace: example-ns
   labels:
     app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
@@ -106,11 +101,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 automountServiceAccountToken: false
 
 ---
@@ -119,6 +111,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: example-backend-kafka
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: kafka
     app.kubernetes.io/instance: example-backend-kafka
@@ -127,11 +120,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 automountServiceAccountToken: false
 
 ---
@@ -140,6 +130,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: example-backend-kafka-user-passwords
+  namespace: example-ns
   labels:
     app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
@@ -147,16 +138,13 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 data:
-  client-passwords: eGtZOFdqVDMwUw==
-  controller-password: cWozd0E2VU5XOA==
-  inter-broker-password: SWdqaXk2UnBtdg==
-  system-user-password: eGtZOFdqVDMwUw==
+  client-passwords: NTNPSzk0bjZ2Zw==
+  controller-password: QmdqWUVrM1pBNg==
+  inter-broker-password: MzFSUnh6bkFHRg==
+  system-user-password: NTNPSzk0bjZ2Zw==
 type: Opaque
 
 ---
@@ -165,6 +153,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: example-backend-kafka-kraft
+  namespace: example-ns
   labels:
     app.kubernetes.io/instance: example-backend-kafka
     app.kubernetes.io/managed-by: Helm
@@ -172,16 +161,13 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 data:
-  cluster-id: MEp1VHBBenFRbEZxTTZFV1B2ZWxnRA==
-  controller-0-id: S2dka2VXeEhlSUk2ZmoySlhLakw2bg==
-  controller-1-id: cDFTWXFsU1ppTkJOd1JPNG02bTlGZQ==
-  controller-2-id: QjRJT1F6N3R4cmxaSmx3aThxM0NWRg==
+  cluster-id: UDBHMThJTHNJSkFrM2Vsdm1rNUV6Mg==
+  controller-0-id: VUFOMzBHWlNldzhrUnY4NFRkdlNxbw==
+  controller-1-id: dEc2OURXaG9Sa0pxU1A2YjB1ZGJrTw==
+  controller-2-id: TWRvZXF1dFJaZlFKRGM2S2J1d090WA==
 type: Opaque
 
 ---
@@ -190,6 +176,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: example-backend-kafka-controller-configuration
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: controller-eligible
     app.kubernetes.io/instance: example-backend-kafka
@@ -199,11 +186,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 data:
   server.properties: |-
     advertised.listeners=CLIENT://advertised-address-placeholder:9092,INTERNAL://advertised-address-placeholder:9094
@@ -234,6 +218,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: example-backend-kafka-controller-headless
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: controller-eligible
     app.kubernetes.io/instance: example-backend-kafka
@@ -243,11 +228,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   clusterIP: None
   ports:
@@ -277,6 +259,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: example-backend-kafka
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: kafka
     app.kubernetes.io/instance: example-backend-kafka
@@ -285,11 +268,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   ports:
     - name: tcp-client
@@ -309,6 +289,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: example-backend-kafka-controller
+  namespace: example-ns
   labels:
     app.kubernetes.io/component: controller-eligible
     app.kubernetes.io/instance: example-backend-kafka
@@ -318,11 +299,8 @@ metadata:
     app.kubernetes.io/version: 4.0.0
     helm.sh/chart: kafka-32.4.2
     static: label
-    synku/component: example-backend-kafka
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   podManagementPolicy: Parallel
   replicas: 3
@@ -345,7 +323,7 @@ spec:
         helm.sh/chart: kafka-32.4.2
       annotations:
         checksum/configuration: c8c243475b27bfbd77ceb19b7123b8955702b333d24aafcbc01375fb31740e78
-        checksum/secret: 9515dda2255d99ac46fc8e5848ccdb94cf839456686eafe54d876eee958b5f27
+        checksum/secret: 35b308589c238ef365434ba4b1df97122fbdcb47e510f3c58ecf23dff0430b1a
     spec:
       affinity:
         podAntiAffinity:
@@ -654,18 +632,40 @@ spec:
             storage: 8Gi
 
 ---
+# example-backend-test1
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: example-backend-test1
+  namespace: example-ns
+  labels:
+    static: label
+  annotations:
+    static: annotation
+
+---
+# example-backend-test2
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: example-backend-test2
+  namespace: example-ns
+  labels:
+    static: label
+  annotations:
+    static: annotation
+
+---
 # example-backend-queue
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: example-backend-queue
+  namespace: example-ns
   labels:
     static: label
-    synku/component: example-backend-queue
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   selector:
     matchLabels:
@@ -691,13 +691,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: example-backend-queue
+  namespace: example-ns
   labels:
     static: label
-    synku/component: example-backend-queue
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   ports:
     - port: 80
@@ -713,13 +711,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: example-backend-worker
+  namespace: example-ns
   labels:
     static: label
-    synku/component: example-backend-worker
-    synku/release: example
   annotations:
     static: annotation
-  namespace: example-ns
 spec:
   replicas: 2
   selector:

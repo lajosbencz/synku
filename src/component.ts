@@ -41,20 +41,14 @@ export interface IComponent {
 
 export class Component implements IComponent {
 
-  protected _parent?: IComponent;
+  protected _parent?: IComponent = undefined;
   protected _children: IComponent[] = [];
   protected _manifests: any[] = [];
   protected _behaviors: Behavior[] = [];
 
-  constructor(parent: IComponent | undefined, public readonly name: string) {
-    this._parent = parent;
-    this._parent?.children.push(this);
-    this.init();
-  }
+  constructor(public readonly name: string) { }
 
-  init(): void {
-    // Default implementation does nothing
-  }
+  init(): void { }
 
   get root(): IComponent {
     let root: IComponent = this;
@@ -102,12 +96,12 @@ export class Component implements IComponent {
   component(nameOrComponent: string | IComponent, init?: ComponentInit): IComponent {
     let component: IComponent;
     if (typeof nameOrComponent === 'string') {
-      component = new Component(this, nameOrComponent);
+      component = new Component(nameOrComponent);
     } else {
       component = nameOrComponent as IComponent;
-      component.setParent(this);
-      this._children.push(component);
     }
+    component.setParent(this);
+    this._children.push(component);
     init?.(component);
     return component;
   }
@@ -139,6 +133,7 @@ export class Component implements IComponent {
   }
 
   async synth(): Promise<[IComponent, any[]][]> {
+    this.init();
     const list: [IComponent, any[]][] = [];
     if (this._manifests.length > 0) {
       list.push([this, this._manifests]);

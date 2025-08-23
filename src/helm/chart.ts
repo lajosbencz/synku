@@ -13,12 +13,11 @@ export class Chart<TValues = any> extends Component {
 
   constructor(
     private chartUrl: string,
+    private namespace: string,
     name: string,
     private values: TValues,
-    private namespace: string = 'default',
-    parent?: IComponent,
   ) {
-    super(parent, name);
+    super(name);
   }
 
   private async fetchAndRender(): Promise<void> {
