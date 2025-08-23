@@ -8,12 +8,6 @@ export async function executeFile(file: string): Promise<void> {
 
     let module;
     
-    // Check if it's a TypeScript file and register tsx loader
-    if (file.endsWith('.ts')) {
-      // Register tsx to handle TypeScript files
-      require('tsx/cjs/api').register();
-    }
-
     // Dynamically import the file
     module = await import(userFile);
     
