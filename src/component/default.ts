@@ -1,11 +1,10 @@
 import { Deployment } from 'kubernetes-models/apps/v1';
 import { ResourceRequirements, Service } from 'kubernetes-models/v1';
 import * as behavior from '../behavior/index';
-import { IComponent } from '../component';
+import { Component } from '../component';
 import { DeepPartial } from '../types';
 
 export interface DefaultAppOptions {
-  name: string;
   image: string;
   tag?: string;
   replicas?: number;
@@ -24,58 +23,61 @@ export const DefaultAppDefaultOptions: DeepPartial<DefaultAppOptions> = {
   matchLabelKey: 'synku/app',
 };
 
-export function simpleApp(parent: IComponent, options: DefaultAppOptions): IComponent {
-  const {
-    name,
-    replicas,
-    revisionHistoryLimit,
-    image,
-    tag,
-    resources,
-    port,
-    containerPort,
-    matchLabelKey,
-  } = { ...DefaultAppDefaultOptions, ...options };
-  return parent.component(name, component => {
-    const matchLabels = {
-      [matchLabelKey!]: component.fullName,
-    };
-    component
-      .manifest(Deployment, {
-        spec: {
-          replicas,
-          revisionHistoryLimit,
-          selector: {
-            matchLabels,
-          },
-          template: {
-            metadata: {
-              labels: {
-                ...matchLabels,
+export class SimpleApp extends Component {
+  constructor(name: string, options: DefaultAppOptions) {
+    super(name);
+    const {
+      replicas,
+      revisionHistoryLimit,
+      image,
+      tag,
+      resources,
+      port,
+      containerPort,
+      matchLabelKey,
+    } = { ...DefaultAppDefaultOptions, ...options };
+
+    this.component(name, component => {
+      const matchLabels = {
+        [matchLabelKey!]: component.fullName,
+      };
+      component
+        .manifest(Deployment, {
+          spec: {
+            replicas,
+            revisionHistoryLimit,
+            selector: {
+              matchLabels,
+            },
+            template: {
+              metadata: {
+                labels: {
+                  ...matchLabels,
+                },
+              },
+              spec: {
+                containers: [
+                  {
+                    name,
+                    image: `${image}:${tag}`,
+                    ports: [{ protocol: 'TCP', containerPort }],
+                    resources,
+                  },
+                ],
               },
             },
-            spec: {
-              containers: [
-                {
-                  name,
-                  image: `${image}:${tag}`,
-                  ports: [{ protocol: 'TCP', containerPort }],
-                  resources,
-                },
-              ],
+          },
+        })
+        .manifest(Service, {
+          spec: {
+            type: 'ClusterIP',
+            selector: {
+              ...matchLabels,
             },
+            ports: [{ port, targetPort: containerPort }],
           },
-        },
-      })
-      .manifest(Service, {
-        spec: {
-          type: 'ClusterIP',
-          selector: {
-            ...matchLabels,
-          },
-          ports: [{ port, targetPort: containerPort }],
-        },
-      })
-      .behavior(behavior.defaultName());
-  });
+        })
+        .behavior(behavior.defaultName());
+    });
+  }
 }
