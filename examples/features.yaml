@@ -141,10 +141,10 @@ metadata:
   annotations:
     static: annotation
 data:
-  client-passwords: T3o5UGNnSXVQbQ==
-  controller-password: dUtwM1o3dkM3Tg==
-  inter-broker-password: elE4WG1rNEFXYw==
-  system-user-password: T3o5UGNnSXVQbQ==
+  client-passwords: MVRJYzZQWTlOMw==
+  controller-password: WDhlVnpqM2ZCMQ==
+  inter-broker-password: Z01kUjBRRnNscg==
+  system-user-password: MVRJYzZQWTlOMw==
 type: Opaque
 
 ---
@@ -164,10 +164,10 @@ metadata:
   annotations:
     static: annotation
 data:
-  cluster-id: WlU1VDVyeXRzU0w4MjhqcTFSS1FyeA==
-  controller-0-id: aGNwTWdJYnprbE1PWktrdDlBVEJnbg==
-  controller-1-id: THA5RkpFSkpDUlhBNllPMlhkS29rMg==
-  controller-2-id: Uml1V2YwOG1wNmRaRklvOUNxY0VkRA==
+  cluster-id: SFYzeEJCUVM2R1hJVkltVW43TTVCTg==
+  controller-0-id: QkNtQjczYVlHZjdNNllwNGJiaWlNYQ==
+  controller-1-id: dlZIeDcycnhjc3JxbUxXS2tOSkg0OQ==
+  controller-2-id: aGU5YnFTeHcyRnllWkdyWUZnQWJaeg==
 type: Opaque
 
 ---
@@ -323,7 +323,7 @@ spec:
         helm.sh/chart: kafka-32.4.2
       annotations:
         checksum/configuration: c8c243475b27bfbd77ceb19b7123b8955702b333d24aafcbc01375fb31740e78
-        checksum/secret: 61f3d842e9376991b80e57538e6a549ec3a995066f726fb98425556db97b297a
+        checksum/secret: f2d063a2bc5b46674c1a2f8ed5e1bc976335ad9a28acc6171d2ce9f41205d414
     spec:
       affinity:
         podAntiAffinity:
@@ -397,11 +397,13 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 750m
+              ephemeral-storage: 2Gi
+              memory: 768Mi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 500m
+              ephemeral-storage: 50Mi
+              memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -632,30 +634,6 @@ spec:
             storage: 8Gi
 
 ---
-# example-backend-test1
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: example-backend-test1
-  namespace: example-ns
-  labels:
-    static: label
-  annotations:
-    static: annotation
-
----
-# example-backend-test2
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: example-backend-test2
-  namespace: example-ns
-  labels:
-    static: label
-  annotations:
-    static: annotation
-
----
 # example-backend-queue
 apiVersion: apps/v1
 kind: StatefulSet
@@ -667,23 +645,10 @@ metadata:
   annotations:
     static: annotation
 spec:
-  selector:
-    matchLabels:
-      example-component: example-backend-queue
-      example-release: example
-  serviceName: example-backend-queue
   template:
     spec:
       containers:
-        - name: queue
-          image: mqtt
-          resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
+        - image: mqtt
 
 ---
 # example-backend-queue
@@ -700,9 +665,6 @@ spec:
   ports:
     - port: 80
       targetPort: 8080
-  selector:
-    example-component: example-backend-queue
-    example-release: example
   type: ClusterIP
 
 ---
@@ -717,20 +679,13 @@ metadata:
   annotations:
     static: annotation
 spec:
-  replicas: 2
   selector:
     matchLabels:
-      example-component: example-backend-worker
-      example-release: example
+      component: worker
   template:
+    metadata:
+      labels:
+        component: worker
     spec:
       containers:
-        - name: worker
-          image: custom-worker
-          resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
+        - image: custom-worker

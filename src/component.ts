@@ -103,7 +103,7 @@ export class Component implements IComponent {
     component.setParent(this);
     this._children.push(component);
     init?.(component);
-    return component;
+    return this;
   }
 
   manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent {

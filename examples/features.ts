@@ -29,69 +29,64 @@ export default
       }));
     })
     .component('backend', backend => {
-      backend.component(new KafkaChart(namespace, 'kafka', {
-        initContainers: [
-          {
-            image: 'foobar',
-            name: 'foobar',
-            command: ['echo'],
-            args: ['foobar'],
-          },
-        ],
-      }));
-
-      const test1 = new Component('test1');
-      test1.manifest(k8s.v1.ServiceAccount, {});
-      backend.component(test1);
-
-      backend.component('test2', test2 => {
-        test2.manifest(k8s.v1.ServiceAccount, {});
-      });
-
-      // create queue component nested under backend
-      backend.component('queue', queue => {
-        queue.manifest(k8s.apps.v1.StatefulSet, {
-          spec: {
-            template: {
-              spec: {
-                containers: [
-                  {
-                    image: 'mqtt',
-                  },
-                ],
-              },
+      backend
+        .component(new KafkaChart(namespace, 'kafka', {
+          initContainers: [
+            {
+              image: 'foobar',
+              name: 'foobar',
+              command: ['echo'],
+              args: ['foobar'],
             },
-          },
+          ],
+        }))
+        .component('queue', queue => {
+          queue
+            .manifest(k8s.apps.v1.StatefulSet, {
+              spec: {
+                template: {
+                  spec: {
+                    containers: [
+                      {
+                        image: 'mqtt',
+                      },
+                    ],
+                  },
+                },
+              },
+            })
+            .manifest(k8s.v1.Service, {
+              spec: {
+                type: 'ClusterIP',
+                ports: [{ port: 80, targetPort: 8080 }],
+              },
+            });
         })
-        queue.manifest(k8s.v1.Service, {
-          spec: {
-            type: 'ClusterIP',
-            ports: [{ port: 80, targetPort: 8080 }],
-          },
-        });
-      });
-
-      // create worker component nested under backend
-      backend.component('worker', queue => {
-        queue.manifest(k8s.apps.v1.Deployment, {
-          spec: {
-            template: {
+        .component('worker', worker => {
+          worker
+            .behavior(behavior.matchLabels({
+              'component': 'worker',
+            }))
+            .manifest(k8s.apps.v1.Deployment, {
               spec: {
-                containers: [
-                  {
-                    image: 'custom-worker',
+                template: {
+                  spec: {
+                    containers: [
+                      {
+                        image: 'custom-worker',
+                      },
+                    ],
                   },
-                ],
+                },
               },
-            },
-          },
+            });
+        })
+        .component('api', api => {
+          api
+            .behavior(behavior.simpleApp({
+              image: 'custom-api',
+              containerPort: 8080,
+            }))
         });
-      });
-
-      // create api component nested under backend
-      backend.component('api').behavior(behavior.simpleApp({
-        image: 'custom-api',
-        containerPort: 8080,
-      }));
     });
 
