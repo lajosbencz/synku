@@ -18,25 +18,40 @@ export interface ComponentConstructorWithArgs<T extends IComponent = IComponent,
   new(...args: TArgs): T;
 }
 
-export interface IComponent {
-  readonly parent?: IComponent;
-  readonly root: IComponent;
-  readonly children: IComponent[];
-  readonly name: string;
-  readonly fullName: string;
+export interface INode<T> {
+  readonly parent?: T;
+  readonly root: T;
+  readonly children: T[];
   setParent(parent: IComponent): void;
   removeChild(child: IComponent): void;
-  component(name: string, init?: ComponentInit): IComponent;
-  component<T extends IComponent>(component: T, init?: ComponentInit<T>): T;
-  manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent;
+}
+
+export interface INameAware {
+  readonly name: string;
+  readonly fullName: string;
+}
+
+export interface IManifestAware {
   find<T = any>(type: Constructor<T>): T;
   findAll(): any[];
   findAll<T>(type: Constructor<T>): T[];
   findAll<T extends readonly Constructor<any>[]>(...types: T): InstanceType<T[number]>[];
-  behavior(behavior: Behavior): IComponent;
+}
+
+export interface IBehaviorAware {
   getBehaviors(): Behavior[];
+}
+
+export interface ISynthesizer {
+  synth<T = any>(): Promise<[IComponent, T[]][]>;
+}
+
+export interface IComponent extends INode<IComponent>, INameAware, IManifestAware, IBehaviorAware, ISynthesizer {
   init(): void;
-  synth(): Promise<[IComponent, any[]][]>;
+  behavior(behavior: Behavior): IComponent;
+  manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent;
+  component(name: string, init?: ComponentInit): IComponent;
+  component<T extends IComponent>(component: T, init?: ComponentInit<T>): T;
 }
 
 export class Component implements IComponent {
@@ -132,9 +147,9 @@ export class Component implements IComponent {
     return [...this._parent?.getBehaviors() ?? [], ...this._behaviors].reverse();
   }
 
-  async synth(): Promise<[IComponent, any[]][]> {
+  async synth<T = any>(): Promise<[IComponent, T[]][]> {
     this.init();
-    const list: [IComponent, any[]][] = [];
+    const list: [IComponent, T[]][] = [];
     if (this._manifests.length > 0) {
       list.push([this, this._manifests]);
     }

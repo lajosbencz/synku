@@ -6,10 +6,8 @@ export async function executeFile(file: string): Promise<void> {
     // Resolve the user file path
     const userFile = path.resolve(process.cwd(), file);
 
-    let module;
-
     // Dynamically import the file
-    module = await import(userFile);
+    const module = await import(userFile);
 
     // Get the default export
     const importedComponent = module.default;
