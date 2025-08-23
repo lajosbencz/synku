@@ -7,13 +7,13 @@ export async function executeFile(file: string): Promise<void> {
     const userFile = path.resolve(process.cwd(), file);
 
     let module;
-    
+
     // Dynamically import the file
     module = await import(userFile);
-    
+
     // Get the default export
     const importedComponent = module.default;
-    
+
     // Verify it's an IComponent
     if (!importedComponent || typeof importedComponent.synth !== 'function') {
       throw new Error('Default export must be an IComponent with a synth() method');
