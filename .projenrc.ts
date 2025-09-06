@@ -54,32 +54,32 @@ const project = new TypeScriptProject({
   },
 });
 
-const wf = project.github!.addWorkflow("docs");
+const wf = project.github!.addWorkflow('docs');
 wf.on({
-  push: { branches: ["master"] },
+  push: { branches: ['master'] },
   workflowDispatch: {},
 });
 
 wf.addJobs({
   publish: {
-    runsOn: ["ubuntu-latest"],
+    runsOn: ['ubuntu-latest'],
     permissions: {
       pages: JobPermission.WRITE,
       idToken: JobPermission.WRITE,
     },
     steps: [
-      { uses: "actions/checkout@v4" },
-      { uses: "actions/setup-node@v4", with: { "node-version": "lts/*" } },
-      { run: "yarn install --frozen-lockfile" },
-      { run: "yarn docgen" },
+      { uses: 'actions/checkout@v4' },
+      { uses: 'actions/setup-node@v4', with: { 'node-version': 'lts/*' } },
+      { run: 'yarn install --frozen-lockfile' },
+      { run: 'yarn docgen' },
       {
-        uses: "actions/upload-pages-artifact@v3",
+        uses: 'actions/upload-pages-artifact@v3',
         with: {
           path: './docs',
         },
       },
       {
-        uses: "actions/deploy-pages@v4",
+        uses: 'actions/deploy-pages@v4',
       },
     ],
   },
