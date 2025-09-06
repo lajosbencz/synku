@@ -63,7 +63,7 @@ wf.on({
 wf.addJobs({
   publish: {
     permissions: {
-      pages: JobPermission.WRITE,
+      contents: JobPermission.WRITE,
     },
     runsOn: ["ubuntu-latest"],
     steps: [
