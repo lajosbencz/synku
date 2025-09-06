@@ -9,6 +9,10 @@
 - Typesafe
 - Composition
 
+### Documentation
+
+https://lajosbencz.github.io/synku/
+
 ### Examples
 
 - [Definition](examples/features.ts)
@@ -19,7 +23,7 @@
 #### Install
 
 ```bash
-yarn add synku
+yarn add kubernetes-models synku
 ```
 
 #### Compose
@@ -50,7 +54,7 @@ export default synku("example", (release) => {
 #### Synthesize
 
 ```bash
-npx synku ./project.ts
+npx synku ./project.ts > project.yaml
 ```
 
 ### Helm Charts
@@ -106,4 +110,11 @@ export default synku("example", (release) => {
     })
   );
 });
+```
+
+#### Synthesize
+
+```bash
+export SYNKU_TRACE=1
+npx synku ./project.ts > project.yaml
 ```

@@ -56,17 +56,17 @@ const project = new TypeScriptProject({
 
 const wf = project.github!.addWorkflow("docs");
 wf.on({
-  push: { branches: ["main"] },
+  push: { branches: ["master"] },
   workflowDispatch: {},
 });
 
 wf.addJobs({
   publish: {
+    runsOn: ["ubuntu-latest"],
     permissions: {
       pages: JobPermission.WRITE,
       idToken: JobPermission.WRITE,
     },
-    runsOn: ["ubuntu-latest"],
     steps: [
       { uses: "actions/checkout@v4" },
       { uses: "actions/setup-node@v4", with: { "node-version": "lts/*" } },
