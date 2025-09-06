@@ -50,4 +50,5 @@ junit.xml
 /dist/
 !/.eslintrc.json
 !/.github/workflows/docs.yml
+!/CONTRIBUTING.md
 !/.projenrc.ts
