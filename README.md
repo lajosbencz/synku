@@ -18,6 +18,23 @@ https://lajosbencz.github.io/synku/
 - [Definition](examples/features.ts)
 - [Synthesis](examples/features.yaml)
 
+### Glossary
+
+#### Manifest
+
+- Kubernetes API Object
+
+#### Behavior
+
+- Mutates manifests based on user logic
+
+#### Component
+
+- Contains a list of Manifests
+- Has a list of attached Behaviors
+- Is organized into a tree structure
+- Behaviors of parent components are inherited
+
 ### Usage
 
 #### Install
@@ -62,15 +79,13 @@ npx synku ./project.ts > project.yaml
 #### Download
 
 ```bash
-helm pull licenseware/kafka-connect --version 0.4.0 --untar --untardir charts
-helm pull oci://registry-1.docker.io/bitnamicharts/schema-registry --version 26.0.5 --untar --untardir charts
+helm pull oci://registry-1.docker.io/bitnamicharts/kafka --version 32.4.3 --untar --untardir charts
 ```
 
 #### Generate
 
 ```bash
-npx synku chart ./charts/kafka-connect --name KafkaConnect --output kafka-connect-chart.ts
-npx synku chart ./charts/schema-registry --name SchemaRegistry --output schema-registry-chart.ts
+npx synku chart ./charts/kafka --name Kafka --output kafka-chart.ts
 ```
 
 #### Compose
