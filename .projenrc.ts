@@ -63,7 +63,8 @@ wf.on({
 wf.addJobs({
   publish: {
     permissions: {
-      contents: JobPermission.WRITE,
+      pages: JobPermission.WRITE,
+      idToken: JobPermission.WRITE,
     },
     runsOn: ["ubuntu-latest"],
     steps: [
@@ -72,11 +73,13 @@ wf.addJobs({
       { run: "yarn install --frozen-lockfile" },
       { run: "yarn docgen" },
       {
-        uses: "peaceiris/actions-gh-pages@v4",
+        uses: "actions/upload-pages-artifact@v3",
         with: {
-          github_token: "${{ secrets.GITHUB_TOKEN }}",
-          publish_dir: "./docs",
+          path: './docs',
         },
+      },
+      {
+        uses: "actions/deploy-pages@v4",
       },
     ],
   },
