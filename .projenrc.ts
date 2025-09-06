@@ -1,3 +1,4 @@
+import { JobPermission } from 'projen/lib/github/workflows-model';
 import { NodePackageManager, NpmAccess } from 'projen/lib/javascript';
 import { TypeScriptProject } from 'projen/lib/typescript';
 
@@ -14,6 +15,7 @@ const project = new TypeScriptProject({
   // prerelease: 'beta',
   projenrcTs: true,
   packageManager: NodePackageManager.YARN_CLASSIC,
+  docgen: true,
 
   entrypoint: 'lib/index.js',
   bin: {
@@ -34,6 +36,7 @@ const project = new TypeScriptProject({
 
   gitIgnoreOptions: {
     ignorePatterns: [
+      'docs/',
       '.synku-temp*',
     ],
   },
@@ -47,6 +50,34 @@ const project = new TypeScriptProject({
       '/docs/',
       '/examples/',
       '.synku-temp*',
+    ],
+  },
+});
+
+const wf = project.github!.addWorkflow("docs");
+wf.on({
+  push: { branches: ["main"] },
+  workflowDispatch: {},
+});
+
+wf.addJobs({
+  publish: {
+    permissions: {
+      pages: JobPermission.WRITE,
+    },
+    runsOn: ["ubuntu-latest"],
+    steps: [
+      { uses: "actions/checkout@v4" },
+      { uses: "actions/setup-node@v4", with: { "node-version": "lts/*" } },
+      { run: "yarn install --frozen-lockfile" },
+      { run: "yarn docgen" },
+      {
+        uses: "peaceiris/actions-gh-pages@v4",
+        with: {
+          github_token: "${{ secrets.GITHUB_TOKEN }}",
+          publish_dir: "./docs",
+        },
+      },
     ],
   },
 });
