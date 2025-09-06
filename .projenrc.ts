@@ -26,6 +26,7 @@ const project = new TypeScriptProject({
     'yaml@^2.8.1',
     'tsx@^4.20.3',
     'commander@^14.0.0',
+    'recursive-diff@^1.0.9',
   ],
   peerDeps: [
     'kubernetes-models@^4.5.0',

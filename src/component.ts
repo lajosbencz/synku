@@ -1,165 +1,124 @@
 import { Behavior } from './behavior';
-import { Constructor, InstanceType, DeepPartial } from './types';
+import { Node, INode } from './node';
+import { trace } from './trace';
+import { Constructor, DeepPartial } from './types';
 
-export function manifestEquality(a: any, b: any): boolean {
-  if (a.apiVersion && a.kind) {
-    return a.apiVersion === b.apiVersion && a.kind === b.kind;
-  }
-  return b instanceof a;
-}
-
-export type ComponentInit<T extends IComponent = IComponent> = (component: T) => void;
-
-export interface ComponentConstructor<T extends IComponent = IComponent> {
-  new(name: string, parent?: IComponent): T;
-}
-
-export interface ComponentConstructorWithArgs<T extends IComponent = IComponent, TArgs extends any[] = any[]> {
-  new(...args: TArgs): T;
-}
-
-export interface INode<T> {
-  readonly parent?: T;
-  readonly root: T;
-  readonly children: T[];
-  setParent(parent: IComponent): void;
-  removeChild(child: IComponent): void;
-}
-
-export interface INameAware {
+export interface NameAware {
+  readonly shortName: string;
+  readonly longName: string;
+  /** Alias of longName */
   readonly name: string;
-  readonly fullName: string;
 }
 
-export interface IManifestAware {
-  find<T = any>(type: Constructor<T>): T;
-  findAll(): any[];
-  findAll<T>(type: Constructor<T>): T[];
-  findAll<T extends readonly Constructor<any>[]>(...types: T): InstanceType<T[number]>[];
+export interface DraftAware<TBase> {
+  find<T extends TBase>(type: Constructor<T>): DeepPartial<T> | null;
+  findAll<T extends TBase>(type?: Constructor<T>): DeepPartial<T>[];
 }
 
-export interface IBehaviorAware {
+type ComponentOptionsOf<T> = T extends new (parent: IComponent<any> | null, name: string, options: infer O) => any ? O : never;
+
+export interface IComponent<TBase extends any = any> extends INode<IComponent<TBase>>, NameAware, DraftAware<TBase> {
+  readonly drafts: DeepPartial<TBase>[];
+  readonly behaviors: Behavior[];
+  add(name: string): IComponent<TBase>;
+  add<C extends Constructor<IComponent<TBase>>>(name: string, type: C, options: ComponentOptionsOf<C>): InstanceType<C>;
+  draft<TDraft extends TBase = TBase>(type: Constructor<TDraft>, draft: DeepPartial<TDraft>): this;
+  with(behavior: Behavior): this;
   getBehaviors(): Behavior[];
 }
 
-export interface ISynthesizer {
-  synth<T = any>(): Promise<[IComponent, T[]][]>;
-}
+export class Component<TBase extends any = any> extends Node<Component<TBase>> implements IComponent<TBase> {
 
-export interface IComponent extends INode<IComponent>, INameAware, IManifestAware, IBehaviorAware, ISynthesizer {
-  init(): void;
-  behavior(behavior: Behavior): IComponent;
-  manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent;
-  component(name: string, init?: ComponentInit): IComponent;
-  component<T extends IComponent>(component: T, init?: ComponentInit<T>): T;
-}
+  private _drafts: DeepPartial<TBase>[] = [];
+  private _behaviors: Behavior[] = [];
 
-export class Component implements IComponent {
+  constructor(parent: IComponent<TBase> | null, public readonly shortName: string) {
+    super(parent as Component<TBase>);
+  }
 
-  protected _parent?: IComponent = undefined;
-  protected _children: IComponent[] = [];
-  protected _manifests: any[] = [];
-  protected _behaviors: Behavior[] = [];
+  public get drafts(): DeepPartial<TBase>[] {
+    return this._drafts;
+  }
 
-  constructor(public readonly name: string) { }
+  public get behaviors(): Behavior[] {
+    return this._behaviors;
+  }
 
-  init(): void { }
-
-  get root(): IComponent {
-    let root: IComponent = this;
-    while (root.parent) {
-      root = root.parent;
+  public get longName(): string {
+    let name = this.shortName;
+    let node = this.parent;
+    while (node) {
+      name = `${node.shortName}-${name}`;
+      node = node.parent;
     }
-    return root;
+    return name;
   }
 
-  get parent(): IComponent | undefined {
-    return this._parent;
+  public get name(): string {
+    return this.longName;
   }
 
-  get children(): IComponent[] {
-    return this._children;
-  }
-
-  get fullName(): string {
-    let fullName = '';
-    let node: IComponent | undefined = this;
-    do {
-      if (fullName !== '') {
-        fullName = `${node!.name}-${fullName}`;
-      } else {
-        fullName = node!.name;
-      }
-      node = node!.parent;
-    } while (node);
-    return fullName;
-  }
-
-  setParent(parent?: IComponent): void {
-    if (this._parent && this._parent !== parent) {
-      this._parent.removeChild(this);
-    }
-    this._parent = parent;
-  }
-
-  removeChild(child: IComponent): void {
-    this._children = this._children.filter(e => e !== child);
-  }
-
-  component(name: string, init?: ComponentInit): IComponent;
-  component<T extends IComponent>(component: T, init?: ComponentInit<T>): T;
-  component(nameOrComponent: string | IComponent, init?: ComponentInit): IComponent {
-    let component: IComponent;
-    if (typeof nameOrComponent === 'string') {
-      component = new Component(nameOrComponent);
-    } else {
-      component = nameOrComponent as IComponent;
-    }
-    component.setParent(this);
-    this._children.push(component);
-    init?.(component);
-    return component;
-  }
-
-  manifest<T>(type: Constructor<T>, draft: DeepPartial<T>): IComponent {
-    const manifest = new type(draft);
-    this._manifests.push(manifest);
+  protected self(): Component<TBase> {
     return this;
   }
 
-  find<T = any>(type: Constructor<T>): T {
-    return this._manifests.find(r => manifestEquality(type, r));
-  }
-
-  findAll(...types: Constructor<any>[]): any[] {
-    if (types.length < 1) {
-      return this._manifests;
+  add<C extends Constructor<IComponent<TBase>>>(name: string, type: C, options: ComponentOptionsOf<C>): InstanceType<C>;
+  add(name: string): IComponent<TBase>;
+  add(name: string, type?: Constructor<any>, options?: any): IComponent<TBase> {
+    if (type) {
+      return new type(this, name, options);
+    } else {
+      return new Component<TBase>(this, name);
     }
-    return this._manifests.filter(r => types.some(rt => manifestEquality(r, rt)));
   }
 
-  behavior(behavior: Behavior): IComponent {
+  draft<TDraft extends TBase>(type: Constructor<TDraft>, draft: DeepPartial<TDraft>): this {
+    const instance = new type(draft) as DeepPartial<TBase>;
+    this._drafts.push(instance);
+    return this;
+  }
+
+  find<T extends TBase>(type: Constructor<T>): DeepPartial<T> | null {
+    return this._drafts.find(element => element instanceof type) as DeepPartial<T> || null;
+  }
+
+  findAll<T extends TBase>(type?: Constructor<T>): DeepPartial<T>[] {
+    if (!type) {
+      return this._drafts as DeepPartial<T>[];
+    }
+    return this._drafts.filter(element => element instanceof type) as DeepPartial<T>[];
+  }
+
+  with(behavior: Behavior): this {
+    behavior.__synku_trace = trace(1);
     this._behaviors.push(behavior);
     return this;
   }
 
   getBehaviors(): Behavior[] {
-    return [...this._parent?.getBehaviors() ?? [], ...this._behaviors].reverse();
+    const behaviors: Behavior[] = [
+      ...this.parent?.getBehaviors() ?? [],
+      ...this._behaviors,
+    ];
+    return behaviors;
   }
+}
 
-  async synth<T = any>(): Promise<[IComponent, T[]][]> {
+export abstract class UserComponent<TUserComponentOptions extends {} = {}, T extends any = any> extends Component<T> {
+  public readonly options: TUserComponentOptions;
+  constructor(parent: IComponent<T> | null, public readonly shortName: string, options: TUserComponentOptions) {
+    super(parent, shortName);
+    this.options = this.optionsMerge(options, this.optionsDefaults());
     this.init();
-    const list: [IComponent, T[]][] = [];
-    if (this._manifests.length > 0) {
-      list.push([this, this._manifests]);
-    }
-    for (const child of this.children) {
-      const childResults = await child.synth();
-      list.push(...childResults);
-    }
-    this.getBehaviors().forEach(behavior => {
-      behavior(this);
-    });
-    return list;
   }
+  protected optionsMerge(options: TUserComponentOptions, defaults: DeepPartial<TUserComponentOptions>): TUserComponentOptions {
+    return {
+      ...defaults,
+      ...options,
+    };
+  }
+  protected optionsDefaults(): DeepPartial<TUserComponentOptions> {
+    return {} as DeepPartial<TUserComponentOptions>;
+  }
+  protected abstract init(): void;
 }

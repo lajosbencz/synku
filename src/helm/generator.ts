@@ -185,18 +185,18 @@ export class TypeScriptGenerator {
     }
   }
 
-  private generateChartClass(className: string, interfaceName: string, sourceUrl: string, metadata: ChartMetadata): string {
+  private generateChartClass(className: string, interfaceName: string, sourcePath: string, metadata: ChartMetadata): string {
     const description = metadata.description ? `\n * ${metadata.description}` : '';
     const version = metadata.version ? `\n * @version ${metadata.version}` : '';
     const home = metadata.home ? `\n * @see ${metadata.home}` : '';
 
     return `/**
  * ${className} - Helm chart wrapper${description}${version}${home}
- * @source ${sourceUrl}
+ * @source ${sourcePath}
  */
 export class ${className} extends helm.Chart<${interfaceName}> {
   constructor(namespace: string, name: string, values: ${interfaceName}) {
-    super('${sourceUrl}', namespace, name, values);
+    super('${sourcePath}', namespace, name, values);
   }
 }`;
   }

@@ -1,9 +1,12 @@
+export * from './synthesizer';
+export * from './serializer';
+export * from './logger';
 
-export * as behavior from './behavior/index';
-export * as component from './component/index';
-export * as helm from './helm/index';
+export * as behaviors from './behaviors/index';
+export * as components from './components/index';
 
-export * from './behavior';
-export * from './component';
-export * from './types';
-export * from './writer';
+export { Behavior, behavior } from './behavior';
+export { UserComponent } from './component';
+
+import { synku } from './release';
+export default synku;

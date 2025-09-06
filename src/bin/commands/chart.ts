@@ -6,44 +6,29 @@ import { TypeScriptGenerator } from '../../helm/generator';
 import { FetchOptions } from '../../helm/types';
 
 export const chartCommand = new Command('chart')
-  .description('Generate TypeScript types from Helm chart')
-  .argument('<source>', 'Chart source (OCI, HTTP, Git, or local path)')
+  .description('Generate TypeScript types from local Helm chart')
+  .argument('<source>', 'Local chart path')
   .requiredOption('--name <name>', 'Chart class name')
-  .option('--chart-version <version>', 'Chart version')
   .option('--output <file>', 'Output file path (default: <name>-chart.ts)')
-  .option('--username <user>', 'Registry username')
-  .option('--password <pass>', 'Registry password')
-  .option('--registry-config <file>', 'OCI registry config file')
-  .option('--insecure', 'Allow insecure registry connections')
   .addHelpText('after', `
 Examples:
-  Generate types from OCI registry:
-    $ synku chart oci://registry-1.docker.io/bitnamicharts/postgresql --name PostgreSQL
-
-  Generate types from HTTP URL:
-    $ synku chart https://charts.bitnami.com/bitnami/nginx-15.1.0.tgz --name Nginx
-
   Generate types from local chart:
     $ synku chart ./local-chart --name LocalChart
 
-  Generate with custom options:
-    $ synku chart oci://registry/chart --name MyChart --chart-version 1.0.0 --output my-chart.ts
+  Generate with custom output:
+    $ synku chart ./my-chart --name MyChart --output my-chart.ts
 `)
   .action(async (source: string, options: ChartCommandOptions) => {
-    const { name, chartVersion, output, username, password, registryConfig, insecure } = options;
+    const { name, output } = options;
 
     const outputFile = output || `${name.toLowerCase()}-chart.ts`;
 
     const fetchOptions: FetchOptions = {
-      version: chartVersion,
-      username,
-      password,
-      registryConfig,
-      insecure,
+      outputPath: outputFile,
     };
 
     try {
-      console.log(`Fetching chart from: ${source}`);
+      console.log(`Processing local chart: ${source}`);
 
       // Detect chart source and fetch
       const chartSource = detectChartSource(source);
@@ -51,7 +36,7 @@ Examples:
       const fetchResult = await fetcher.fetch(chartSource, fetchOptions);
       const chartPath = fetchResult.chartDir;
 
-      console.log(`Chart fetched to: ${chartPath}`);
+      console.log(`Chart loaded from: ${chartPath}`);
       console.log('Generating TypeScript types...');
 
       // Generate TypeScript types
@@ -71,7 +56,7 @@ Examples:
       console.log('  // Chart values here');
       console.log('});');
 
-      // Cleanup temporary files
+      // Cleanup temporary files (not needed for local charts, but keeping for consistency)
       if (fetchResult.tempDir) {
         await fs.rm(fetchResult.tempDir, { recursive: true, force: true });
       }
@@ -84,10 +69,5 @@ Examples:
 
 interface ChartCommandOptions {
   name: string;
-  chartVersion?: string;
   output?: string;
-  username?: string;
-  password?: string;
-  registryConfig?: string;
-  insecure?: boolean;
 }

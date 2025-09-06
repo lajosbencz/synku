@@ -87,6 +87,11 @@
       "type": "runtime"
     },
     {
+      "name": "recursive-diff",
+      "version": "^1.0.9",
+      "type": "runtime"
+    },
+    {
       "name": "tsx",
       "version": "^4.20.3",
       "type": "runtime"

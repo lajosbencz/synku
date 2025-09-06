@@ -40,17 +40,11 @@ Examples:
   Execute a TypeScript project file:
     $ synku ./project.ts
 
-  Generate chart types from OCI registry:
-    $ synku chart oci://registry-1.docker.io/bitnamicharts/postgresql --name PostgreSQL
-
-  Generate chart types from HTTP URL:
-    $ synku chart https://charts.bitnami.com/bitnami/nginx-15.1.0.tgz --name Nginx
-
   Generate chart types from local chart:
     $ synku chart ./my-local-chart --name MyChart
 
   Generate with custom output:
-    $ synku chart oci://registry/chart --name MyChart --output custom-chart.ts
+    $ synku chart ./my-chart --name MyChart --output custom-chart.ts
 `);
 
 // Parse command line arguments

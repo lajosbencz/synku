@@ -1,27 +1,40 @@
 import path from 'path';
-import { write } from '../../writer';
+import { Serializer, SerializerTraced, Synthesizer, ISynthesizer, ISerializer } from '../../';
+import { IComponent } from '../../component';
+import { Chart } from '../../helm/chart';
+import { isTruishString } from '../../utils';
 
 export async function executeFile(file: string): Promise<void> {
-  try {
-    // Resolve the user file path
-    const userFile = path.resolve(process.cwd(), file);
+  const userFile = path.resolve(process.cwd(), file);
+  const module = await import(userFile);
+  const releasePromise = module.default;
+  if (!releasePromise) {
+    throw new Error('Default export must be a release Promise or IComponent');
+  }
 
-    // Dynamically import the file
-    const module = await import(userFile);
+  const release = await releasePromise;
 
-    // Get the default export
-    const importedComponent = module.default;
+  // Render all charts before synthesis
+  await renderChartsRecursively(release);
 
-    // Verify it's an IComponent
-    if (!importedComponent || typeof importedComponent.synth !== 'function') {
-      throw new Error('Default export must be an IComponent with a synth() method');
-    }
+  const synthesizer: ISynthesizer = new Synthesizer();
+  const synth = synthesizer.synth(release);
 
-    // Process the component
-    const synth = await importedComponent.synth();
-    write(synth, process.stdout);
-  } catch (error) {
-    console.error('Failed to execute file:', error instanceof Error ? error.message : error);
-    process.exit(1);
+  let serializer: ISerializer = new Serializer();
+  if (isTruishString(process.env.SYNKU_TRACE ?? '0')) {
+    serializer = new SerializerTraced();
+  }
+  serializer.serialize(synth, process.stdout);
+}
+
+async function renderChartsRecursively(component: IComponent): Promise<void> {
+  // Render chart if this component is a Chart instance
+  if (component instanceof Chart) {
+    await component.render();
+  }
+
+  // Recursively render charts in child components
+  for (const child of component.children) {
+    await renderChartsRecursively(child);
   }
 }

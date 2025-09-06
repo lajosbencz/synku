@@ -1,0 +1,133 @@
+---
+#> example-simple
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-simple-config
+  labels:
+    # add [example-simple] examples/simple.ts:23
+    synku/release: example-simple
+data:
+  ENV: development
+#< example-simple
+
+
+---
+#>>> example-simple-backend-db
+apiVersion: v1
+kind: Service
+spec:
+  type: ClusterIP
+  selector:
+    synku/app: example-simple-backend-db
+  ports:
+    - port: 3306
+      targetPort: 3306
+metadata:
+  labels:
+    # add [example-simple] examples/simple.ts:23
+    synku/release: example-simple
+  # add [example-simple-backend-db] examples/simple.ts:15
+  name: example-simple-backend-db
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+spec:
+  serviceName: example-simple-backend-db
+  replicas: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  template:
+    metadata:
+      labels:
+        synku/app: example-simple-backend-db
+    spec:
+      containers:
+        - image: bitnami/mysql:latest
+          envFrom:
+            - secretRef:
+                name: example-mysql-users
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/mysql/data
+metadata:
+  labels:
+    # add [example-simple] examples/simple.ts:23
+    synku/release: example-simple
+  # add [example-simple-backend-db] examples/simple.ts:15
+  name: example-simple-backend-db
+#<<< example-simple-backend-db
+
+
+---
+#>>> example-simple-backend-api
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - image: example-api:latest
+          env:
+            - name: DB_HOST
+              value: example-simple-backend-db
+metadata:
+  labels:
+    # add [example-simple] examples/simple.ts:23
+    synku/release: example-simple
+  # add [example-simple-backend-api] examples/simple.ts:15
+  name: example-simple-backend-api
+#<<< example-simple-backend-api
+
+
+---
+#>>> example-simple-backend-worker
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - image: example-worker:latest
+          env:
+            - name: DB_HOST
+              value: example-simple-backend-db
+metadata:
+  labels:
+    # add [example-simple] examples/simple.ts:23
+    synku/release: example-simple
+  # add [example-simple-backend-worker] examples/simple.ts:15
+  name: example-simple-backend-worker
+#<<< example-simple-backend-worker
+
+
+---
+#>> example-simple-frontend
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - image: nginx:latest
+          env:
+            - name: UPSTREAM_BACKEND
+              value: http://example-simple-backend:8080
+metadata:
+  labels:
+    # add [example-simple] examples/simple.ts:23
+    synku/release: example-simple
+  # add [example-simple-frontend] examples/simple.ts:15
+  name: example-simple-frontend
+#<< example-simple-frontend

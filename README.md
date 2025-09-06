@@ -27,19 +27,24 @@ yarn add synku
 ```typescript
 // project.ts
 import * as k8s from "kubernetes-models";
-import { Component } from "synku";
+import synku, { behavior } from "synku";
 
-export default new Component("project")
-  .behavior((component) => {
-    component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
-      configMap.data!.baz = "bax";
+export default synku("example", (release) => {
+  const config = release.add("config");
+  config
+    .with(
+      behavior((component) => {
+        component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
+          configMap.data!.baz = "bax";
+        });
+      })
+    )
+    .draft(k8s.v1.ConfigMap, {
+      data: {
+        foo: "bar",
+      },
     });
-  })
-  .manifest(k8s.v1.ConfigMap, {
-    data: {
-      foo: "bar",
-    },
-  });
+});
 ```
 
 #### Synthesize
@@ -50,10 +55,18 @@ npx synku ./project.ts
 
 ### Helm Charts
 
+#### Download
+
+```bash
+helm pull licenseware/kafka-connect --version 0.4.0 --untar --untardir charts
+helm pull oci://registry-1.docker.io/bitnamicharts/schema-registry --version 26.0.5 --untar --untardir charts
+```
+
 #### Generate
 
 ```bash
-npx synku chart 'oci://registry-1.docker.io/bitnamicharts/kafka' --name Kafka --output kafka-chart.ts
+npx synku chart ./charts/kafka-connect --name KafkaConnect --output kafka-connect-chart.ts
+npx synku chart ./charts/schema-registry --name SchemaRegistry --output schema-registry-chart.ts
 ```
 
 #### Compose
@@ -61,25 +74,36 @@ npx synku chart 'oci://registry-1.docker.io/bitnamicharts/kafka' --name Kafka --
 ```typescript
 // project.ts
 import * as k8s from "kubernetes-models";
-import { Component } from "synku";
+import synku, { behavior } from "synku";
 import { KafkaChart } from "./kafka-chart.ts";
 
-export default new Component("project")
-  .behavior((component) => {
-    component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
-      configMap.data!.baz = "bax";
+export default synku("example", (release) => {
+  release
+    .with(
+      behavior((component) => {
+        component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
+          configMap.data!.baz = "bax";
+        });
+      })
+    )
+    .draft(k8s.v1.ConfigMap, {
+      data: {
+        foo: "bar",
+      },
     });
-  })
-  .manifest(k8s.v1.ConfigMap, {
-    data: {
-      foo: "bar",
-    },
-  })
-  .component(new KafkaChart('namespace', 'kafka', {
+  const kafka = release.add("kafka", KafkaChart, {
     broker: {
       persistence: {
         enabled: false,
       },
     },
-  }));
+  });
+  kafka.with(
+    behavior((component) => {
+      component.findAll(k8s.v1.ConfigMap).forEach((configMap) => {
+        delete configMap.data?.baz;
+      });
+    })
+  );
+});
 ```

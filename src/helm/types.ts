@@ -1,9 +1,4 @@
 export interface FetchOptions {
-  version?: string;
-  username?: string;
-  password?: string;
-  registryConfig?: string;
-  insecure?: boolean;
   outputPath?: string;
 }
 
@@ -23,9 +18,6 @@ export interface ChartDependency {
 }
 
 export enum ChartSourceType {
-  OCI = 'oci',
-  HTTP = 'http',
-  GIT = 'git',
   LOCAL = 'local',
 }
 

@@ -1,7 +1,14 @@
 
-export type Constructor<T> = new (...args: any[]) => T;
+import rdiff from 'recursive-diff';
+import { ITrace } from './trace';
 
-export type InstanceType<T> = T extends Constructor<infer U> ? U : never;
+export type StateChange = {
+  readonly diff: rdiff.rdiffResult;
+  readonly trace: ITrace;
+  readonly manifestIndex: number;
+};
+
+export type Constructor<T> = new (...args: any[]) => T;
 
 export type DeepPartial<T> = T extends Function
   ? T
