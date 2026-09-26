@@ -44,11 +44,12 @@ junit.xml
 !/.github/pull_request_template.md
 !/test/
 !/tsconfig.json
-!/tsconfig.dev.json
+!/test/tsconfig.json
 !/src/
 /lib
 /dist/
 !/.eslintrc.json
+!/projenrc/tsconfig.json
 !/.github/workflows/docs.yml
 !/CONTRIBUTING.md
 !/.projenrc.ts
